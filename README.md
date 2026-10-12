@@ -81,7 +81,6 @@ Students search a digital catalog, check availability, reserve books, and track 
 - [ ] Configure system settings (fine rates, loan durations)
 - [ ] Generate reports on library usage and fines
 
->  Tick these off as they get implemented or fully designed.
 
 ---
 
