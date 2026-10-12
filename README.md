@@ -37,31 +37,31 @@ A Library Management System with functionality for both **students** and **libra
 
 Students search a digital catalog, check availability, reserve books, and track their loans. Librarians hand out books, manage physical copies, and impose fines for overdue returns. Assistant librarians help at the desk using scanning to identify physical copies.
 
-> 💡 The **catalog is digital**, but the **books are physical**. A reservation is only a request. The librarian physically hands the book over, and that's the moment the loan starts.
+>  The **catalog is digital**, but the **books are physical**. A reservation is only a request. The librarian physically hands the book over, and that's the moment the loan starts.
 
 ---
 
-## 👥 Who Uses It
+##  Who Uses It
 
 | Role | What they do |
 |---|---|
-| 🎓 **Student** | Search catalog, check availability, reserve, return, view loan statuses |
-| 📖 **Librarian** | Hand out books, create loans, manage copies, impose fines, add/edit/remove books and damaged copies |
-| 🏷️ **Assistant Librarian** | Help hand out and return books using scanning, view reservations |
-| 👑 **Administrator** | Manage library staff, configure system-wide settings, and oversee system integrity |
+|  **Student** | Search catalog, check availability, reserve, return, view loan statuses |
+|  **Librarian** | Hand out books, create loans, manage copies, impose fines, add/edit/remove books and damaged copies |
+|  **Assistant Librarian** | Help hand out and return books using scanning, view reservations |
+|  **Administrator** | Manage library staff, configure system-wide settings, and oversee system integrity |
 
 ---
 
-## ✨ Features
+##  Features
 
-### 🎓 Student
+### Student
 - [ ] Search the digital library catalog
 - [ ] Check the availability of a book
 - [ ] Reserve a book for loan
 - [ ] Return a book
 - [ ] View loan statuses (including due dates)
 
-### 📖 Librarian
+### Librarian
 - [ ] Hand out reserved books and create loans (system records the loan and assigns a due date)
 - [ ] Track whether books have been returned
 - [ ] Manage the number of physical copies per book
@@ -71,23 +71,23 @@ Students search a digital catalog, check availability, reserve books, and track 
 - [ ] Edit book information
 - [ ] Remove books, and individual physical copies if damaged
 
-### 🏷️ Assistant Librarian
+### Assistant Librarian
 - [ ] Assist with handing out and returning books
 - [ ] Identify physical copies by scanning
 - [ ] View reservations to see which books are reserved
 
-### 👑 Administrator
+### Administrator
 - [ ] Manage library staff (Librarians and Assistant Librarians)
 - [ ] Configure system settings (fine rates, loan durations)
 - [ ] Generate reports on library usage and fines
 
-> ✅ Tick these off as they get implemented or fully designed.
+>  Tick these off as they get implemented or fully designed.
 
 ---
 
-## 🎯 Scope
+## Scope
 
-### ✅ In scope
+### In scope
 - Catalog search and availability check
 - Reservations, handouts, loans, due dates, returns
 - Loan status view for students
@@ -96,7 +96,7 @@ Students search a digital catalog, check availability, reserve books, and track 
 - Scan-based identification of copies
 - Reservation overview for staff
 
-### ❌ Out of scope
+### Out of scope
 > *TBD by the team. Suggestions to confirm or cut:*
 - Online payment of fines
 - E-books / digital lending
@@ -107,35 +107,33 @@ Students search a digital catalog, check availability, reserve books, and track 
 
 ---
 
-## 📝 Assumptions
+## Assumptions
 
-> *Fill in as the team decides. Keep these consistent with the UML.*
-
-1. _Reservations are placed on a **book (title)**; the librarian assigns a specific **copy** at handout._ ⬅️ confirm
+1. _TBD_
 2. _TBD_
 3. _TBD_
 
 ---
 
-## 🔄 Loan Lifecycle
+##  Loan Lifecycle
 
 ```mermaid
 flowchart LR
-    A[🔍 Search catalog] --> B[✅ Check availability]
-    B --> C[📌 Reserve]
-    C --> D[🤝 Librarian hands out copy]
-    D --> E[📄 Loan recorded + due date]
+    A[ Search catalog] --> B[✅ Check availability]
+    B --> C[ Reserve]
+    C --> D[ Librarian hands out copy]
+    D --> E[ Loan recorded + due date]
     E --> F{Returned on time?}
-    F -- Yes --> G[📥 Return recorded]
-    F -- No --> H[💸 Fine imposed]
+    F -- Yes --> G[ Return recorded]
+    F -- No --> H[ Fine imposed]
     H --> G
 ```
 
 ---
 
-## 🧩 UML Diagrams
+##  UML Diagrams
 
-> 🚧 **Work in progress.** Source files live in [`/docs/uml/`](docs/uml/) so commit history shows who did what.
+>  **Work in progress.** Source files live in [`/docs/uml/`](docs/uml/) so commit history shows who did what.
 
 ### Class Diagram
 
@@ -151,17 +149,17 @@ flowchart LR
 
 | File | Owner | Status |
 |---|---|---|
-| `docs/uml/class-diagram.puml` | _TBD_ | ⏳ Not started |
+| `docs/uml/class-diagram.puml` | _TBD_ |  Not started |
 
 ### Sequence Diagrams
 
 | # | Scenario | Diagram | Owner | Status |
 |---|---|---|---|---|
-| 1 | Student reserves a book | _link / image_ | _TBD_ | ⏳ |
-| 2 | Librarian hands out a book (loan + due date) | _link / image_ | _TBD_ | ⏳ |
-| 3 | Student returns a book (overdue → fine) | _link / image_ | _TBD_ | ⏳ |
-| 4 | Assistant librarian scans a copy | _link / image_ | _TBD_ | ⏳ |
-| 5 | Librarian removes a damaged copy | _link / image_ | _TBD_ | ⏳ |
+| 1 | Student reserves a book | _link / image_ | _TBD_ |  |
+| 2 | Librarian hands out a book (loan + due date) | _link / image_ | _TBD_ |  |
+| 3 | Student returns a book (overdue → fine) | _link / image_ | _TBD_ |  |
+| 4 | Assistant librarian scans a copy | _link / image_ | _TBD_ |  |
+| 5 | Librarian removes a damaged copy | _link / image_ | _TBD_ |  |
 
 <!-- Example embed:
 ### 1. Student Reserves a Book
@@ -170,7 +168,7 @@ flowchart LR
 
 ---
 
-## ⚠️ Design Risks & Patterns
+##  Design Risks & Patterns
 
 > *Minimum 2 risks. Each one: the risk, why it's likely, the pattern that handles it, and where it shows in the class diagram.*
 
@@ -192,7 +190,7 @@ flowchart LR
 
 ---
 
-## 🗂️ Repository Structure
+##  Repository Structure
 
 ```
 📦 repo
@@ -206,7 +204,7 @@ flowchart LR
 
 ---
 
-## 🧑‍💻 Team
+##  Team
 
 **The Principled Four**
 
@@ -217,11 +215,10 @@ flowchart LR
 | _Name_ | Sequence diagrams (staff side) + scanner | [@username](https://github.com/) |
 | _Name_ | Design risks + patterns, repo, slides | [@username](https://github.com/) |
 
-> 🔑 Everyone commits their own work from their own account.
 
 ---
 
-## 📅 Deliverables & Timeline
+## Deliverables & Timeline
 
 | Deliverable | Due | Status |
 |---|---|---|
@@ -236,8 +233,6 @@ flowchart LR
 ---
 
 <div align="center">
-
-**Built with 🧠 and a healthy fear of violating SOLID.**
 
 *The Principled Four · SWEN-383*
 
