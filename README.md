@@ -31,7 +31,7 @@
 
 ---
 
-## 🔭 Overview
+## Overview
 
 A Library Management System with functionality for both **students** and **librarians**, offering services and managing those services.
 
