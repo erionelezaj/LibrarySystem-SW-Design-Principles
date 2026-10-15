@@ -1,0 +1,16 @@
+@startuml LibrarySystem
+
+class Student
+class Book
+class Copy
+class Reservation
+class Loan 
+class Fine
+class Catalog
+class Librarian
+class AssistantLibrarian
+class LibrarySettings
+class EmailSender
+
+
+@enduml
