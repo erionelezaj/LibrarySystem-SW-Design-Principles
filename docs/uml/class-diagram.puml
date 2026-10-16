@@ -1,15 +1,68 @@
 @startuml LibrarySystem
 
-class Student
-class Book
-class Copy
-class Reservation
-class Loan 
-class Fine
-class Catalog
-class Librarian
-class AssistantLibrarian
-class LibrarySettings
+class Student {
+    - fullName: String
+    - studentId: int
+    - email: String
+}
+
+
+class Book {
+    - title: String
+    - isbn: String
+    - author: String
+    + isAvailable(): boolean
+    + reserve(s: Student): Reservation
+}
+class Copy {
+    - barcode: String
+    - damaged: boolean
+    + isAvailable(): boolean
+}
+
+
+
+class Reservation {
+    - reservedOn: Date
+    - holdDueDate: Date
+    - status: String
+}
+
+
+
+
+class Loan {
+    - startDate: Date
+    - dueDate: Date
+    - returnedDate: Date
+}
+
+
+class Fine {
+    - amount: double
+    - paid: boolean
+    - waived: boolean
+}
+
+class Catalog {
+    + search(title: String): Book[]
+}
+class Librarian {
+    - fullName: String
+    - librarianId: int
+
+}
+
+class AssistantLibrarian {
+    - fullName: String
+    - assistantId: int
+}
+
+class LibrarySettings {
+    - loanPeriod: int
+    - holdPeriod: int
+    - fineRate: double
+}
 class EmailSender
 
 

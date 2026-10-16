@@ -112,6 +112,7 @@ Librarians also configure the library settings: the loan period, the hold period
 - Multiple library branches
 - Detailed authentication / SSO
 - Administrator role, staff management and usage reports
+- Loan renewals / extensions (a due date cannot be extended)
 
 ---
 
