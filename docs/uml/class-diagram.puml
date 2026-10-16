@@ -4,6 +4,8 @@ class Student {
     - fullName: String
     - studentId: int
     - email: String
+    + viewLoans(): Loan[]
+    + viewReservations(): Reservation[]
 }
 
 
@@ -13,11 +15,14 @@ class Book {
     - author: String
     + isAvailable(): boolean
     + reserve(s: Student): Reservation
+    + nextReservation(): Reservation
 }
+
 class Copy {
     - barcode: String
     - damaged: boolean
     + isAvailable(): boolean
+    + lendTo(s: Student, dueDate: Date): Loan
 }
 
 
@@ -26,6 +31,9 @@ class Reservation {
     - reservedOn: Date
     - holdDueDate: Date
     - status: String
+    + hold(holdDueDate: Date, c: Copy)
+    + expire(today: Date)
+    + cancel()
 }
 
 
@@ -35,6 +43,9 @@ class Loan {
     - startDate: Date
     - dueDate: Date
     - returnedDate: Date
+    + close(today: Date)
+    + isOverdue(today: Date): boolean
+    + daysLate(today: Date): int
 }
 
 
@@ -42,10 +53,12 @@ class Fine {
     - amount: double
     - paid: boolean
     - waived: boolean
+    + waive()
 }
 
 class Catalog {
     + search(title: String): Book[]
+    + findCopy(barcode: String): Copy
 }
 class Librarian {
     - fullName: String
@@ -62,8 +75,17 @@ class LibrarySettings {
     - loanPeriod: int
     - holdPeriod: int
     - fineRate: double
+    + changeFineRates(rate: double)
+    + changeLoanPeriods(days: int)
+    + changeHoldPeriod(days: int)
+    + calculateLoanDueDate(start: Date): Date
+    + calculateHoldDueDate(start: Date): Date
+    + calculateFine(daysLate: int): double
+
 }
-class EmailSender
+class EmailSender {
+    + sendTo(to: String, message: String)
+}
 
 
 @enduml
