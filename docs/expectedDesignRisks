@@ -1,17 +1,19 @@
-1. Invalid physical-copy state transitions
-- Anticipated risk: The design may allow invalid operations, such as loaning out a damaged copy, returning a copy twice, or removing a copy that still has an active loan.
-- Why anticipate it? Your scope includes scanning, lending, returns, and damaged-copy removal. These operations interact with the same physical copy throughout its lifecycle.
-- Potential pattern: State (Behavioral) — if the UML reveals sufficiently complex state-dependent behavior that a simple status enum and validation would not handle cleanly.
-- UML evidence to examine: BookCopy, its status, Loan, and the handout, return, and damaged-copy-removal sequence diagrams.
+Design Risk 1: Tight Coupling to EmailSender
+Design Pattern: Adapter (Structural)
+Problem: ReminderScheduler and LibraryController depend directly on EmailSender. If the library switches to an external email provider with a different API, existing code may need modification.
+SOLID/GRASP at risk:
+- Dependency Inversion Principle (DIP): High-level classes depend on a concrete implementation rather than an abstraction.
+- Low Coupling: Notification-related changes may affect multiple classes.
+- Protected Variations: The system is not insulated from changes in email providers.
+Solution: Introduce a NotificationSender interface and an EmailAdapter that translates requests to the external provider's API.
+Benefit: Email providers can be changed without modifying the controller or scheduler.
 
-2. Changes to fine-calculation rules
-- Anticipated risk: If fine-calculation rules change or differ between loan categories, the design may require modifications across multiple classes, creating inconsistent calculations.
-- Why anticipate it? Your administrator can configure fine rates, and librarians impose fines for overdue returns. The design must determine where the calculation rules belong and how configuration changes affect existing loans.
-- Potential pattern: Strategy (Behavioral) — if different calculation algorithms are required. If there is only one formula with a configurable rate, a separate strategy may not be justified.
-- UML evidence to examine: Loan, Fine, the administrator's settings, and the return sequence diagram.
-
-3. Reservation, availability, and loan coordination
-- Anticipated risk: The design may confuse a reservation for a book title with a loan of a specific physical copy, potentially allowing inconsistent availability or duplicate loans.
-- Why anticipate it? Your specification explicitly states that reservations are requests and that loans begin only when a librarian physically hands out a book. These are distinct operations that must be coordinated.
-- Potential pattern: No formal pattern selected yet. First examine whether your class responsibilities and sequence diagrams adequately coordinate the operations. Consider a formal behavioral pattern only if the resulting design reveals a specific problem it addresses.
-- UML evidence to examine: Book, BookCopy, Reservation, Loan, and the reservation and handout sequence diagrams.
+Design Risk 2: Catalog Taking on Too Many Responsibilities
+Design Pattern: Proxy (Structural)
+Problem: Catalog handles searching, adding, and removing books. If authorization checks are added directly to it, the class will gain unrelated responsibilities and become harder to maintain.
+SOLID/GRASP at risk:
+- Single Responsibility Principle (SRP): Catalog would handle both book management and access control.
+- High Cohesion: Unrelated security responsibilities would reduce the class's focus.
+- Protected Variations: Changes in authorization rules could affect catalog logic.
+Solution: Introduce a CatalogProxy implementing the same CatalogAccess interface as Catalog. The proxy checks permissions before forwarding requests.
+Benefit: Access control is separated from catalog functionality, making the system easier to maintain and extend.
