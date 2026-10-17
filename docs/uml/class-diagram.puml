@@ -4,10 +4,11 @@ class Student {
     - fullName: String
     - studentId: int
     - email: String
-    + viewLoans(): Loan[]
-    + viewReservations(): Reservation[]
+    + getLoans(): Loan[]
+    + getReservations(): Reservation[]
+    + getFines(): Fine[]
+    + getEmail(): String
 }
-
 
 class Book {
     - title: String
@@ -16,6 +17,10 @@ class Book {
     + isAvailable(): boolean
     + reserve(s: Student): Reservation
     + nextReservation(): Reservation
+    + getReservations(): Reservation[]
+    + addCopy(barcode: String): Copy
+    + getCopies(): Copy[]
+    + edit(title: String, author: String)
 }
 
 class Copy {
@@ -23,6 +28,8 @@ class Copy {
     - damaged: boolean
     + isAvailable(): boolean
     + lendTo(s: Student, dueDate: Date): Loan
+    + currentLoan(): Loan
+    + markDamaged()
 }
 
 
@@ -34,6 +41,7 @@ class Reservation {
     + hold(holdDueDate: Date, c: Copy)
     + expire(today: Date)
     + cancel()
+    + getStudent(): Student
 }
 
 
@@ -46,6 +54,8 @@ class Loan {
     + close(today: Date)
     + isOverdue(today: Date): boolean
     + daysLate(today: Date): int
+    + createFine(amount: double): Fine
+    + getStudent(): Student
 }
 
 
@@ -54,38 +64,84 @@ class Fine {
     - paid: boolean
     - waived: boolean
     + waive()
+    + pay()
 }
 
 class Catalog {
     + search(title: String): Book[]
     + findCopy(barcode: String): Copy
+    + findBook(isbn: String): Book
+    + addBook(title: String, isbn: String, author: String)
+    + removeBook(isbn: String)
+    + findOverdueLoans(today: Date): Loan[]
 }
-class Librarian {
-    - fullName: String
-    - librarianId: int
 
-}
-
-class AssistantLibrarian {
-    - fullName: String
-    - assistantId: int
+class ReminderScheduler {
+    + checkOverdueLoans(today: Date)
 }
 
 class LibrarySettings {
     - loanPeriod: int
     - holdPeriod: int
     - fineRate: double
-    + changeFineRates(rate: double)
-    + changeLoanPeriods(days: int)
-    + changeHoldPeriod(days: int)
+    + update(loanPeriod: int, holdPeriod: int, fineRate: double)
     + calculateLoanDueDate(start: Date): Date
     + calculateHoldDueDate(start: Date): Date
     + calculateFine(daysLate: int): double
-
 }
+
+class LibraryController {
+    + search(title: String): Book[]
+    + checkAvailability(b: Book): boolean
+    + reserveBook(s: Student, b: Book)
+    + cancelReservation(r: Reservation)
+    + viewLoans(s: Student): Loan[]
+    + viewStudentReservations(s: Student): Reservation[]
+    + lendCopy(barcode: String, s: Student): Loan
+    + returnCopy(barcode: String): Fine
+    + viewFines(s: Student): Fine[]
+    + payFine(f: Fine)
+    + waiveFine(f: Fine)
+    + viewBookReservations(isbn: String): Reservation[]
+    + addBook(title: String, isbn: String, author: String)
+    + editBook(isbn: String, title: String, author: String)
+    + removeBook(isbn: String)
+    + addCopy(isbn: String, barcode: String)
+    + markDamagedCopy(barcode: String)
+    + viewCopies(isbn: String): Copy[]
+    + changeSettings(loanPeriod: int, holdPeriod: int, fineRate: double)
+}
+
 class EmailSender {
     + sendTo(to: String, message: String)
 }
 
+
+
+ Student "1" -- "0..*" Loan : borrows 
+ Student "1" -- "0..*" Reservation 
+
+ Book "1" *-- "0..* {ordered}" Reservation : waitingLine 
+ Book "1" *-- "0..*" Copy: has
+
+Reservation "0..1" -- "0..1" Copy : holds
+
+Copy "1" -- "0..*" Loan : lent in 
+ 
+Catalog "1" *-- "0..*" Book
+Catalog ..> Copy
+
+
+Loan "1" *-- "0..1" Fine
+
+ReminderScheduler "1" -- "1" Catalog
+ReminderScheduler "1" -- "1" EmailSender
+ReminderScheduler ..> Loan
+
+LibraryController "1" -- "1" Catalog
+LibraryController "1" -- "1" LibrarySettings
+LibraryController "1" -- "1" EmailSender
+LibraryController ..> Book
+LibraryController ..> Copy
 
 @enduml
