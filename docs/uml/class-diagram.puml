@@ -80,6 +80,7 @@ class Reservation {
     + expire(today: Date)
     + cancel()
     + getStudent(): Student
+    + complete()    
 }
 
 class Copy {
@@ -89,6 +90,7 @@ class Copy {
     + lendTo(s: Student, dueDate: Date): Loan
     + currentLoan(): Loan
     + markDamaged()
+    + canLendTo(s: Student): boolean
 }
 
 class Loan {
