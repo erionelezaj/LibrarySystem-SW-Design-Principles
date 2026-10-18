@@ -24,6 +24,7 @@ class LibraryController {
 
 class ReminderScheduler {
     + checkOverdueLoans(today: Date)
+    + checkExpiredHolds(Today: Date)
 }
 
 class EmailSender {
@@ -37,6 +38,7 @@ class Catalog {
     + addBook(title: String, isbn: String, author: String)
     + removeBook(isbn: String)
     + findOverdueLoans(today: Date): Loan[]
+    + findExpiredHolds(today: Date): Reservation[]
 }
 
 class LibrarySettings {
