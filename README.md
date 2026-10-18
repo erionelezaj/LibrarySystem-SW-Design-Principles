@@ -35,7 +35,7 @@
 
 A Library Management System that gives functionality for students, librarians and assistant librarians, offering services and managing those services.
 
-Students can search the digital library catalog, check the availability of a book, and reserve a book for a loan. A reservation is for a book title, not a specific copy. When a copy is free, it is put on hold for the student who reserved it, and the hold expires after a few days if the student does not pick it up. If all copies are out, students wait in line in the order they reserved. Students can also walk into the library and borrow any copy that is on the shelf and not on hold.
+Students can search the digital library catalog, check the availability of a book, and reserve a book for a loan. A reservation is for a book title, not a specific copy. When a copy is free, it is put on hold for the student who reserved it, and the hold expires after a few days if the student does not pick it up. If all copies are out, students wait in line in the order they reserved. A student can cancel a reservation at any time before picking up the book. Students can also walk into the library and borrow any copy that is on the shelf and not on hold.
 
 The physical book must be handed out by a librarian or assistant librarian, who scans the copy. At that moment the system records the loan and gives a due date. Students return the book at the desk, where the copy is scanned again, and the system records the return. Students can see the status of their loans and reservations.
 
