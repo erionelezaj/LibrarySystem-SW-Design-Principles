@@ -35,19 +35,19 @@
 
 A Library Management System that gives functionality for students, librarians and assistant librarians, offering services and managing those services.
 
-Students can search the digital library catalog, check the availability of a book, and reserve a book for a loan. A reservation is for a book title, not a specific copy. When a copy is free, it is put on hold for the student who reserved it, and the hold expires after a few days if the student does not pick it up. If all copies are out, students wait in line in the order they reserved. A student can cancel a reservation at any time before picking up the book. Students can also walk into the library and borrow any copy that is on the shelf and not on hold.
+**Students** can search the digital library catalog, check the availability of a book, and place a reservation for a book title. A reservation is for a book title, not a specific copy. When a copy is free, it is put on hold for the student who reserved it, and the student gets an email. The hold expires after the hold period if the student does not pick the book up; the copy is then put on hold for the next student in line, or goes back on the shelf if no one is waiting. If all copies are out, students wait in line in the order they reserved. A student can cancel a reservation at any time before picking up the book. Students can also walk into the library and borrow any copy that is on the shelf and not on hold.
 
-The physical book must be handed out by a librarian or assistant librarian, who scans the copy. At that moment the system records the loan and gives a due date. Students return the book at the desk, where the copy is scanned again, and the system records the return. Students can see the status of their loans and reservations.
+The physical book must be handed out by a librarian or assistant librarian, who scans the copy. At that moment the system records the loan and gives a due date. Students return the book at the desk, where staff scan the copy again, and the system records the return. When a copy is returned and students are waiting for that title, the system puts it on hold for the next student in line and emails them. Students can see the status of their loans, reservations and fines: a reservation is waiting in line, on hold with an expiry date, completed, expired, or cancelled; a loan is on loan with a due date, overdue, or returned.
 
-If a book is returned late, the system calculates a fine based on how many days it is overdue. A librarian can waive the fine. Fines are paid in person at the desk, where staff record the payment.
+Once a day, the system checks for overdue loans and emails the students who have them, and it releases holds that have expired. If a book is returned late, the system calculates a fine based on how many days it is overdue. A librarian can waive the fine. Fines are paid in person at the desk, where a librarian records the payment.
 
-Librarians manage handing out books and giving out loans, and manage how many physical copies of a book there are. They can see the status of individual copies and identify which ones are loaned out or on hold. They can add new books with information such as the author name and title, edit book information, and remove books from the system. Damaged physical copies are taken off the shelf and marked as damaged, but their record is kept.
+**Librarians** hand out physical copies and record loans: they scan the copy at the desk, and the system records the loan and assigns a due date. They manage the physical copies of each book by adding copies and marking copies as damaged, and they can see the status of every individual copy (available, on hold, on loan, or damaged). They can add new books (author, title, ISBN), edit book information, and remove books. A book cannot be removed while any of its copies is on loan or on hold, or while students are waiting for it; a removed book is marked as withdrawn and its record is kept. Damaged copies are taken off the shelf but their record is kept, so loan history stays intact. A copy that is on loan cannot be marked as damaged until it is returned.
 
-Assistant librarians assist with handing out and returning books, using scanning to identify physical copies. The system displays reservations so librarians can see which books have been reserved.
+**Assistant librarians** work at the desk: they scan copies when handing them out (the system records the loan) and when they are returned (the system records the return and calculates any fine). Librarians and assistant librarians can view reservations and holds: the queue order, each student's position, and which copy is on hold for which student.
 
 Librarians also configure the library settings: the loan period, the hold period, and the fine rate.
 
->  The **catalog is digital**, but the **books are physical**. A reservation is only a request. The librarian physically hands the book over, and that's the moment the loan starts.
+> The catalog is digital, but the books are physical. A reservation is only a request. The librarian or assistant librarian physically hands the book over, and that's the moment the loan starts.
 
 ---
 
@@ -55,7 +55,7 @@ Librarians also configure the library settings: the loan period, the hold period
 
 | Role | What they do |
 |---|---|
-|  **Student** | Search catalog, check availability, reserve, cancel a reservation, return, view loan statuses |
+|  **Student** | Search catalog, check availability, reserve, cancel a reservation, return, view loan, reservation and fine statuses |
 |  **Librarian** | Hand out books, create loans, manage copies, record fine payments, waive fines, add/edit/remove books, mark damaged copies, configure settings (loan period, hold period, fine rate) |
 |  **Assistant Librarian** | Help hand out and return books using scanning, view reservations |
 
@@ -96,13 +96,14 @@ Librarians also configure the library settings: the loan period, the hold period
 - Catalog search and availability check
 - Reservations, handouts, loans, due dates, returns
 - Students can cancel a reservation
-- A hold is put on a reserved copy and expires in a few days
+- A hold is put on a reserved copy and expires after the hold period; the copy then goes on hold for the next student in line, or back on the shelf if no one is waiting
 - Students can pick up copies without reserving, if it is on the shelf and not on hold
 - Students wait in line in the order they reserved for books that have no available copies in the moment
-- Loan status view for students
+- Loan, reservation and fine status view for students
 - Fines for overdue books, calculated by the system; librarians can waive them
-- Fines are paid in person at the desk, and staff record the payment in the system
+- Fines are paid in person at the desk, and a librarian records the payment in the system
 - Book and physical copy management (add / edit / remove)
+- A book cannot be removed while any of its copies is on loan or on hold, or while students are waiting for it; a removed book is marked as withdrawn and its record is kept
 - Damaged copies are taken off the shelf and marked as damaged; their record is kept so the loan history stays intact
 - Scan-based identification of copies
 - Reservation overview for staff
@@ -126,7 +127,7 @@ Librarians also configure the library settings: the loan period, the hold period
 
 1. Identifying the student at the desk (e.g. scanning a student card) is handled outside our design; the system receives the student who is borrowing.
 2. Every book is identified by its ISBN, and every physical copy by a unique barcode.
-3. Overdue loans are checked once a day, and the overdue email is sent then.
+3. Overdue loans and expired holds are checked once a day; the overdue email is sent then, and expired holds are released.
 
 ---
 

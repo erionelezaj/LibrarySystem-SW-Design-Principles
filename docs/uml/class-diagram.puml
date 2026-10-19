@@ -24,7 +24,7 @@ class LibraryController {
 
 class ReminderScheduler {
     + checkOverdueLoans(today: Date)
-    + checkExpiredHolds(Today: Date)
+    + checkExpiredHolds(today: Date)
 }
 
 class EmailSender {
@@ -36,7 +36,6 @@ class Catalog {
     + findCopy(barcode: String): Copy
     + findBook(isbn: String): Book
     + addBook(title: String, isbn: String, author: String)
-    + removeBook(isbn: String)
     + findOverdueLoans(today: Date): Loan[]
     + findExpiredHolds(today: Date): Reservation[]
 }
@@ -55,6 +54,7 @@ class Book {
     - title: String
     - isbn: String
     - author: String
+    - withdrawn: boolean
     + isAvailable(): boolean
     + reserve(s: Student): Reservation
     + nextReservation(): Reservation
@@ -62,6 +62,8 @@ class Book {
     + addCopy(barcode: String): Copy
     + getCopies(): Copy[]
     + edit(title: String, author: String)
+    + canBeWithdrawn(): boolean
+    + withdraw()
 }
 
 class Student {
@@ -82,7 +84,8 @@ class Reservation {
     + expire(today: Date)
     + cancel()
     + getStudent(): Student
-    + complete()    
+    + complete() 
+    + getCopy(): Copy   
 }
 
 class Copy {
@@ -93,6 +96,8 @@ class Copy {
     + currentLoan(): Loan
     + markDamaged()
     + canLendTo(s: Student): boolean
+    + isInUse(): boolean
+    + getBook(): Book
 }
 
 class Loan {
@@ -123,6 +128,7 @@ LibraryController ..> Copy
 
 ReminderScheduler "1" -- "1" EmailSender
 ReminderScheduler "1" -- "1" Catalog
+ReminderScheduler "1" -- "1" LibrarySettings
 ReminderScheduler ..> Loan
 
 Catalog "1" *-- "0..*" Book
