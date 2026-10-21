@@ -31,7 +31,7 @@
 
 ---
 
-## Overview -- Project Description
+## Overview - Project Description
 
 A Library Management System that gives functionality for students, librarians and assistant librarians, offering services and managing those services.
 
@@ -185,10 +185,6 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 | 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | Done |
 | 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
 
-<!-- Example embed:
-### 1. Student Reserves a Book
-![Reserve sequence](docs/uml/seq-reserve.png)
--->
 
 ---
 
