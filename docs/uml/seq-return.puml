@@ -1,0 +1,91 @@
+@startuml SequenceReturn
+actor "Staff (Librarian/Asst)" as Staff
+participant ":LibraryController" as Controller
+participant ":Catalog" as Catalog
+participant "c:Copy" as Copy
+participant "l:Loan" as Loan
+participant "s:Student" as Student
+participant ":LibrarySettings" as Settings
+participant "b:Book" as Book
+participant "r:Reservation" as Reservation
+participant ":EmailSender" as Email
+
+Staff -> Controller: returnCopy(barcode)
+activate Controller
+
+Controller -> Catalog: findCopy(barcode)
+activate Catalog
+Catalog --> Controller: c
+deactivate Catalog
+
+Controller -> Copy: currentLoan()
+activate Copy
+Copy --> Controller: l
+deactivate Copy
+
+Controller -> Loan: close(today)
+activate Loan
+Loan --> Controller: returnDate
+deactivate Loan
+
+Controller -> Loan: isOverdue(today)
+activate Loan
+Loan --> Controller: late
+deactivate Loan
+
+alt late is true
+    Controller -> Loan: daysLate(today)
+    activate Loan
+    Loan --> Controller: days
+    deactivate Loan
+    
+    Controller -> Settings: calculateFine(days)
+    activate Settings
+    Settings --> Controller: amount
+    deactivate Settings
+    
+    Controller -> Loan: createFine(amount)
+    activate Loan
+    Loan --> Controller: f
+    deactivate Loan
+end
+
+Controller -> Copy: getBook()
+activate Copy
+Copy --> Controller: b
+deactivate Copy
+
+Controller -> Book: nextReservation()
+activate Book
+Book --> Controller: r
+deactivate Book
+
+alt r != null
+    Controller -> Settings: calculateHoldDueDate(today)
+    activate Settings
+    Settings --> Controller: holdDueDate
+    deactivate Settings
+    
+    Controller -> Reservation: hold(holdDueDate, c)
+    activate Reservation
+    deactivate Reservation
+    
+    Controller -> Reservation: getStudent()
+    activate Reservation
+    Reservation --> Controller: nextStudent
+    deactivate Reservation
+    
+    Controller -> Student: getEmail()
+    activate Student
+    Student --> Controller: emailAddr
+    deactivate Student
+    
+    Controller -> Email: sendTo(emailAddr, "Your reserved copy is ready")
+    activate Email
+    deactivate Email
+end
+
+Controller --> Staff: fine (if any)
+deactivate Controller
+
+@enduml
