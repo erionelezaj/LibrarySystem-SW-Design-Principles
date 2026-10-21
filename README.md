@@ -64,29 +64,29 @@ Librarians also configure the library settings: the loan period, the hold period
 ##  Features
 
 ### Student
-- [ ] Search the digital library catalog
-- [ ] Check the availability of a book
-- [ ] Reserve a book for loan
-- [ ] Cancel a reservation
-- [ ] Return a book
-- [ ] View loan statuses (including due dates)
+- [x] Search the digital library catalog
+- [x] Check the availability of a book
+- [x] Reserve a book for loan
+- [x] Cancel a reservation
+- [x] Return a book
+- [x] View loan statuses (including due dates)
 
 ### Librarian
-- [ ] Hand out reserved books and create loans (system records the loan and assigns a due date)
-- [ ] Track whether books have been returned
-- [ ] Manage the number of physical copies per book
-- [ ] View the status of individual copies and see which are loaned out
-- [ ] Waive fines for overdue books (the system calculates them)
-- [ ] Record fines paid in person at the desk
-- [ ] Add new books (author, title, etc.)
-- [ ] Edit book information
-- [ ] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
-- [ ] Configure library settings (loan period, hold period, fine rate)
+- [x] Hand out reserved books and create loans (system records the loan and assigns a due date)
+- [x] Track whether books have been returned
+- [x] Manage the number of physical copies per book
+- [x] View the status of individual copies and see which are loaned out
+- [x] Waive fines for overdue books (the system calculates them)
+- [x] Record fines paid in person at the desk
+- [x] Add new books (author, title, etc.)
+- [x] Edit book information
+- [x] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
+- [x] Configure library settings (loan period, hold period, fine rate)
 
 ### Assistant Librarian
-- [ ] Assist with handing out and returning books
-- [ ] Identify physical copies by scanning
-- [ ] View reservations to see which books are reserved
+- [x] Assist with handing out and returning books
+- [x] Identify physical copies by scanning
+- [x] View reservations to see which books are reserved
 
 ---
 
@@ -250,7 +250,7 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 | Project description & scope | Mon 26 Oct | ✅ |
 | Class diagram | Mon 26 Oct | ✅ |
 | Sequence diagrams | Mon 26 Oct | ⏳ |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ |
 | PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ |
 | GitHub repo link (public) | Mon 26 Oct, midnight | ✅ |
 | 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ |
