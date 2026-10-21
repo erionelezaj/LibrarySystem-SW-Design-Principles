@@ -196,21 +196,21 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 > *Minimum 2 risks. Each one: the risk, why it's likely, the pattern that handles it, and where it shows in the class diagram.*
 
-### Risk 1: _TBD_
+### Risk 1: Inconsistent State during Concurrent Access
 | | |
 |---|---|
-| **Why it's likely** | _TBD_ |
-| **Pattern** | _TBD_ |
-| **Where it shows in the UML** | _TBD_ |
-| **SOLID / GRASP link** | _TBD_ |
+| **Why it's likely** | Multiple staff members might try to check out the same physical copy or modify a book's status simultaneously, leading to race conditions. |
+| **Pattern** | Controller / Singleton |
+| **Where it shows in the UML** | `LibraryController` acts as a single point of entry for all domain logic, ensuring operations are coordinated. |
+| **SOLID / GRASP link** | GRASP Controller / Single Responsibility Principle |
 
-### Risk 2: _TBD_
+### Risk 2: High Coupling between Logic and Notification
 | | |
 |---|---|
-| **Why it's likely** | _TBD_ |
-| **Pattern** | _TBD_ |
-| **Where it shows in the UML** | _TBD_ |
-| **SOLID / GRASP link** | _TBD_ |
+| **Why it's likely** | Hard-coding email notifications directly into the loan or reservation logic makes it difficult to change notification methods (e.g., adding SMS) later. |
+| **Pattern** | Pure Fabrication / Dependency Injection |
+| **Where it shows in the UML** | `EmailSender` and `ReminderScheduler` are separated from the core domain classes (`Loan`, `Book`). |
+| **SOLID / GRASP link** | GRASP Pure Fabrication / Dependency Inversion Principle |
 
 ---
 
@@ -250,7 +250,7 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 | Project description & scope | Mon 26 Oct | ✅ | Mon 12 Oct |
 | Class diagram | Mon 26 Oct | ✅ | Tue 06 Oct |
 | Sequence diagrams | Mon 26 Oct | ⏳ | In Progress |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ | In Progress |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Wed 21 Oct |
 | PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
 | GitHub repo link (public) | Mon 26 Oct, midnight | ✅ | Wed 14 Oct |
 | 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ | Not Started |
