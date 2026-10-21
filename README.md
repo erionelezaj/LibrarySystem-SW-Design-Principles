@@ -245,15 +245,15 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 ## Deliverables & Timeline
 
-| Deliverable | Due | Status |
-|---|---|---|
-| Project description & scope | Mon 26 Oct | ✅ |
-| Class diagram | Mon 26 Oct | ✅ |
-| Sequence diagrams | Mon 26 Oct | ⏳ |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ |
-| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ |
-| GitHub repo link (public) | Mon 26 Oct, midnight | ✅ |
-| 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ |
+| Deliverable | Due | Status | Completed |
+|---|---|---|---|
+| Project description & scope | Mon 26 Oct | ✅ | Mon 12 Oct |
+| Class diagram | Mon 26 Oct | ✅ | Tue 06 Oct |
+| Sequence diagrams | Mon 26 Oct | ⏳ | In Progress |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ | In Progress |
+| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
+| GitHub repo link (public) | Mon 26 Oct, midnight | ✅ | Wed 14 Oct |
+| 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ | Not Started |
 
 ---
 
