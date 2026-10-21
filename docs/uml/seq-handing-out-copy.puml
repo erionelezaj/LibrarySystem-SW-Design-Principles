@@ -1,0 +1,44 @@
+@startuml HandingOutCopy
+actor Librarian
+
+participant ":LibraryController" as controller
+participant ":Catalog" as catalog
+participant "c:Copy" as copy
+participant ":Reservation" as reservation
+participant "l:Loan" as loan
+participant ":LibrarySettings"  as settings
+
+
+
+Librarian -> controller: lendCopy(barcode, s)
+
+controller -> catalog: findCopy(barcode)
+catalog --> controller: c
+
+controller -> copy: canLendTo(s)
+copy --> controller: canLend
+
+alt  can lend
+    controller -> settings: calculateLoanDueDate(today)
+    settings --> controller: dueDate
+
+    controller -> copy: lendTo(s, dueDate)
+    copy -> loan: new Loan(s, dueDate)
+    loan --> copy: l
+
+    opt copy was on hold for this student
+        copy  -> reservation: complete()
+    end
+
+    copy --> controller: l
+
+    controller --> Librarian: l
+
+
+
+else  can't lend
+    controller --> Librarian: refused
+end
+
+
+@enduml

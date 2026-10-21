@@ -31,13 +31,23 @@
 
 ---
 
-## Overview
+## Overview -- Project Description
 
-A Library Management System with functionality for both **students** and **librarians**, offering services and managing those services.
+A Library Management System that gives functionality for students, librarians and assistant librarians, offering services and managing those services.
 
-Students search a digital catalog, check availability, reserve books, and track their loans. Librarians hand out books, manage physical copies, and impose fines for overdue returns. Assistant librarians help at the desk using scanning to identify physical copies.
+**Students** can search the digital library catalog, check the availability of a book, and place a reservation for a book title. A reservation is for a book title, not a specific copy. When a copy is free, it is put on hold for the student who reserved it, and the student gets an email. The hold expires after the hold period if the student does not pick the book up; the copy is then put on hold for the next student in line, or goes back on the shelf if no one is waiting. If all copies are out, students wait in line in the order they reserved. A student can cancel a reservation at any time before picking up the book. Students can also walk into the library and borrow any copy that is on the shelf and not on hold.
 
->  The **catalog is digital**, but the **books are physical**. A reservation is only a request. The librarian physically hands the book over, and that's the moment the loan starts.
+The physical book must be handed out by a librarian or assistant librarian, who scans the copy. At that moment the system records the loan and gives a due date. Students return the book at the desk, where staff scan the copy again, and the system records the return. When a copy is returned and students are waiting for that title, the system puts it on hold for the next student in line and emails them. Students can see the status of their loans, reservations and fines: a reservation is waiting in line, on hold with an expiry date, completed, expired, or cancelled; a loan is on loan with a due date, overdue, or returned.
+
+Once a day, the system checks for overdue loans and emails the students who have them, and it releases holds that have expired. If a book is returned late, the system calculates a fine based on how many days it is overdue. A librarian can waive the fine. Fines are paid in person at the desk, where a librarian records the payment.
+
+**Librarians** hand out physical copies and record loans: they scan the copy at the desk, and the system records the loan and assigns a due date. They manage the physical copies of each book by adding copies and marking copies as damaged, and they can see the status of every individual copy (available, on hold, on loan, or damaged). They can add new books (author, title, ISBN), edit book information, and remove books. A book cannot be removed while any of its copies is on loan or on hold, or while students are waiting for it; a removed book is marked as withdrawn and its record is kept. Damaged copies are taken off the shelf but their record is kept, so loan history stays intact. A copy that is on loan cannot be marked as damaged until it is returned.
+
+**Assistant librarians** work at the desk: they scan copies when handing them out (the system records the loan) and when they are returned (the system records the return and calculates any fine). Librarians and assistant librarians can view reservations and holds: the queue order, each student's position, and which copy is on hold for which student.
+
+Librarians also configure the library settings: the loan period, the hold period, and the fine rate.
+
+> The catalog is digital, but the books are physical. A reservation is only a request. The librarian or assistant librarian physically hands the book over, and that's the moment the loan starts.
 
 ---
 
@@ -45,10 +55,9 @@ Students search a digital catalog, check availability, reserve books, and track 
 
 | Role | What they do |
 |---|---|
-|  **Student** | Search catalog, check availability, reserve, return, view loan statuses |
-|  **Librarian** | Hand out books, create loans, manage copies, impose fines, add/edit/remove books and damaged copies |
+|  **Student** | Search catalog, check availability, reserve, cancel a reservation, return, view loan, reservation and fine statuses |
+|  **Librarian** | Hand out books, create loans, manage copies, record fine payments, waive fines, add/edit/remove books, mark damaged copies, configure settings (loan period, hold period, fine rate) |
 |  **Assistant Librarian** | Help hand out and return books using scanning, view reservations |
-|  **Administrator** | Manage library staff, configure system-wide settings, and oversee system integrity |
 
 ---
 
@@ -58,6 +67,7 @@ Students search a digital catalog, check availability, reserve books, and track 
 - [ ] Search the digital library catalog
 - [ ] Check the availability of a book
 - [ ] Reserve a book for loan
+- [ ] Cancel a reservation
 - [ ] Return a book
 - [ ] View loan statuses (including due dates)
 
@@ -66,21 +76,17 @@ Students search a digital catalog, check availability, reserve books, and track 
 - [ ] Track whether books have been returned
 - [ ] Manage the number of physical copies per book
 - [ ] View the status of individual copies and see which are loaned out
-- [ ] Impose fines for overdue books
+- [ ] Waive fines for overdue books (the system calculates them)
+- [ ] Record fines paid in person at the desk
 - [ ] Add new books (author, title, etc.)
 - [ ] Edit book information
-- [ ] Remove books, and individual physical copies if damaged
+- [ ] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
+- [ ] Configure library settings (loan period, hold period, fine rate)
 
 ### Assistant Librarian
 - [ ] Assist with handing out and returning books
 - [ ] Identify physical copies by scanning
 - [ ] View reservations to see which books are reserved
-
-### Administrator
-- [ ] Manage library staff (Librarians and Assistant Librarians)
-- [ ] Configure system settings (fine rates, loan durations)
-- [ ] Generate reports on library usage and fines
-
 
 ---
 
@@ -89,28 +95,39 @@ Students search a digital catalog, check availability, reserve books, and track 
 ### In scope
 - Catalog search and availability check
 - Reservations, handouts, loans, due dates, returns
-- Loan status view for students
-- Fines for overdue books
+- Students can cancel a reservation
+- A hold is put on a reserved copy and expires after the hold period; the copy then goes on hold for the next student in line, or back on the shelf if no one is waiting
+- Students can pick up copies without reserving, if it is on the shelf and not on hold
+- Students wait in line in the order they reserved for books that have no available copies in the moment
+- Loan, reservation and fine status view for students
+- Fines for overdue books, calculated by the system; librarians can waive them
+- Fines are paid in person at the desk, and a librarian records the payment in the system
 - Book and physical copy management (add / edit / remove)
+- A book cannot be removed while any of its copies is on loan or on hold, or while students are waiting for it; a removed book is marked as withdrawn and its record is kept
+- Damaged copies are taken off the shelf and marked as damaged; their record is kept so the loan history stays intact
 - Scan-based identification of copies
 - Reservation overview for staff
+- Email to students when a copy they reserved is available, and when a loan is overdue
+- Librarians handle the configuration of library settings & policies such as loan period, hold period, and fine rate.
 
 ### Out of scope
-> *TBD by the team. Suggestions to confirm or cut:*
 - Online payment of fines
 - E-books / digital lending
-- Email / SMS notifications
-- Multiple library branches
+- SMS / Push notification
 - Recommendations
+- Multiple library branches
 - Detailed authentication / SSO
+- Administrator role, staff management and usage reports
+- Loan renewals / extensions (a due date cannot be extended)
+- Recording which staff member handled a loan or waived a fine (staff are actors, not stored in the system)
 
 ---
 
 ## Assumptions
 
-1. _TBD_
-2. _TBD_
-3. _TBD_
+1. Identifying the student at the desk (e.g. scanning a student card) is handled outside our design; the system receives the student who is borrowing.
+2. Every book is identified by its ISBN, and every physical copy by a unique barcode.
+3. Overdue loans and expired holds are checked once a day; the overdue email is sent then, and expired holds are released.
 
 ---
 
@@ -138,27 +155,35 @@ flowchart LR
 
 <!-- Replace with: ![Class Diagram](docs/uml/class-diagram.png) -->
 
-```
-┌──────────────────────────────────────────┐
-│                                          │
-│        📐 CLASS DIAGRAM — COMING SOON     │
-│                                          │
-└──────────────────────────────────────────┘
-```
+Source: [`docs/uml/class-diagram.puml`](docs/uml/class-diagram.puml) (11 classes)
+
+| Part | Classes | What they do |
+|---|---|---|
+| **Controller** | `LibraryController` | Receives every request from the screens (student, desk, librarian) and passes the work on to the domain classes. It coordinates; it does not do the work itself (GRASP Controller). |
+| **Domain** | `Student`, `Book`, `Copy`, `Reservation`, `Loan`, `Fine`, `Catalog` | The library itself. `Catalog` holds all books, a `Book` holds its copies and its waiting line of reservations, a `Copy` is lent out in loans, and a late `Loan` creates its `Fine`. |
+| **Helpers** | `LibrarySettings` | Holds the loan period, hold period and fine rate, and does the date and fine calculations, so no number is hard-coded anywhere. |
+| | `EmailSender` | Sends the "your reserved copy is ready" and "your loan is overdue" emails. |
+| | `ReminderScheduler` | Checks once a day for overdue loans and sends the reminders. No library concept fits this job, so it is its own class (GRASP Pure Fabrication). |
+
+**Reading the lines**
+- Solid line: one class keeps a reference to the other (association), with a multiplicity on both ends.
+- Filled diamond: the whole owns the part, and the part cannot exist without it (composition), e.g. `Book` and its `Copy` objects.
+- Dashed arrow: one class only uses the other for a moment, as a parameter or return value (dependency).
 
 | File | Owner | Status |
 |---|---|---|
-| `docs/uml/class-diagram.puml` | _TBD_ |  Not started |
+| `docs/uml/class-diagram.puml` | Erion Elezaj | Draft done, to be reviewed by the team |
 
 ### Sequence Diagrams
 
+Each sequence diagram starts with the actor sending a request to `:LibraryController`.
+
 | # | Scenario | Diagram | Owner | Status |
 |---|---|---|---|---|
-| 1 | Student reserves a book | _link / image_ | _TBD_ |  |
-| 2 | Librarian hands out a book (loan + due date) | _link / image_ | _TBD_ |  |
-| 3 | Student returns a book (overdue → fine) | _link / image_ | _TBD_ |  |
-| 4 | Assistant librarian scans a copy | _link / image_ | _TBD_ |  |
-| 5 | Librarian removes a damaged copy | _link / image_ | _TBD_ |  |
+| 1 | Librarian hands out a copy (scan → loan + due date) | _link / image_ | Erion Elezaj | Not started |
+| 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | _link / image_ | Elion Elezaj | Not started |
+| 3 | Student returns a book (late → fine; next student in line gets the hold) | _link / image_ | Lorand Pervizaj | Not started |
+| 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
 
 <!-- Example embed:
 ### 1. Student Reserves a Book
@@ -206,13 +231,14 @@ flowchart LR
 ##  Team
 
 **The Principled Four**
+ Each member has their own sequence diagrams they must make, class diagram will be done by Erion as extra
 
-| Member | Role in Part 1 | GitHub |
+| Member | Role in Part -1| GitHub |
 |---|---|---|
-| _Name_ | Scope + class diagram | [@username](https://github.com/) |
-| _Name_ | Sequence diagrams (student side) | [@username](https://github.com/) |
-| _Name_ | Sequence diagrams (staff side) + scanner | [@username](https://github.com/) |
-| _Name_ | Design risks + patterns, repo, slides | [@username](https://github.com/) |
+| Erion Elezaj | Hand out a copy: librarian scans it, the system creates the loan and sets the due date (Extra: Class UML) | [@erionelezaj](https://github.com/erionelezaj) |
+| Elion Elezaj | Student reserves a book: copy free → hold + email; no copy → waiting line | [@elioni2](https://github.com/elioni2) |
+| Lorand Pervizaj | Student returns a book: late → fine; next student in line gets the hold | [@LorandPervizaj](https://github.com/LorandPervizaj) |
+| Dren Veliu | Mark a damaged copy: refused if the copy is on loan; the copy's record is kept | [@Doreni005](https://github.com/Doreni005) |
 
 
 ---
