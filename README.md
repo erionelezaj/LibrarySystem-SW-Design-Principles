@@ -247,12 +247,12 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 | Deliverable | Due | Status |
 |---|---|---|
-| Project description & scope | Mon 26 Oct | ⏳ |
-| Class diagram | Mon 26 Oct | ⏳ |
+| Project description & scope | Mon 26 Oct | ✅ |
+| Class diagram | Mon 26 Oct | ✅ |
 | Sequence diagrams | Mon 26 Oct | ⏳ |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ |
 | PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ |
-| GitHub repo link (public) | Mon 26 Oct, midnight | ⏳ |
+| GitHub repo link (public) | Mon 26 Oct, midnight | ✅ |
 | 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ |
 
 ---
