@@ -153,7 +153,7 @@ flowchart LR
 
 ### Class Diagram
 
-<!-- Replace with: ![Class Diagram](docs/uml/class-diagram.png) -->
+![Class Diagram](docs/uml/plantuml-diagram.svg)
 
 Source: [`docs/uml/class-diagram.puml`](docs/uml/class-diagram.puml) (11 classes)
 
