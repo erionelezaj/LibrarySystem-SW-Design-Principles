@@ -149,8 +149,6 @@ flowchart LR
 
 ##  UML Diagrams
 
->  **Work in progress.** Source files live in [`/docs/uml/`](docs/uml/) so commit history shows who did what.
-
 ### Class Diagram
 
 ![Class Diagram](docs/uml/plantuml-diagram.svg)
@@ -190,7 +188,6 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 ##  Design Risks & Patterns
 
-> *Minimum 2 risks. Each one: the risk, why it's likely, the pattern that handles it, and where it shows in the class diagram.*
 
 ### Risk 1: Inconsistent State during Concurrent Access
 | | |
