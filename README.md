@@ -31,7 +31,7 @@
 
 ---
 
-## Overview -- Project Description
+## Overview - Project Description
 
 A Library Management System that gives functionality for students, librarians and assistant librarians, offering services and managing those services.
 
@@ -64,29 +64,29 @@ Librarians also configure the library settings: the loan period, the hold period
 ##  Features
 
 ### Student
-- [ ] Search the digital library catalog
-- [ ] Check the availability of a book
-- [ ] Reserve a book for loan
-- [ ] Cancel a reservation
-- [ ] Return a book
-- [ ] View loan statuses (including due dates)
+- [x] Search the digital library catalog
+- [x] Check the availability of a book
+- [x] Reserve a book for loan
+- [x] Cancel a reservation
+- [x] Return a book
+- [x] View loan statuses (including due dates)
 
 ### Librarian
-- [ ] Hand out reserved books and create loans (system records the loan and assigns a due date)
-- [ ] Track whether books have been returned
-- [ ] Manage the number of physical copies per book
-- [ ] View the status of individual copies and see which are loaned out
-- [ ] Waive fines for overdue books (the system calculates them)
-- [ ] Record fines paid in person at the desk
-- [ ] Add new books (author, title, etc.)
-- [ ] Edit book information
-- [ ] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
-- [ ] Configure library settings (loan period, hold period, fine rate)
+- [x] Hand out reserved books and create loans (system records the loan and assigns a due date)
+- [x] Track whether books have been returned
+- [x] Manage the number of physical copies per book
+- [x] View the status of individual copies and see which are loaned out
+- [x] Waive fines for overdue books (the system calculates them)
+- [x] Record fines paid in person at the desk
+- [x] Add new books (author, title, etc.)
+- [x] Edit book information
+- [x] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
+- [x] Configure library settings (loan period, hold period, fine rate)
 
 ### Assistant Librarian
-- [ ] Assist with handing out and returning books
-- [ ] Identify physical copies by scanning
-- [ ] View reservations to see which books are reserved
+- [x] Assist with handing out and returning books
+- [x] Identify physical copies by scanning
+- [x] View reservations to see which books are reserved
 
 ---
 
@@ -149,11 +149,9 @@ flowchart LR
 
 ##  UML Diagrams
 
->  **Work in progress.** Source files live in [`/docs/uml/`](docs/uml/) so commit history shows who did what.
-
 ### Class Diagram
 
-<!-- Replace with: ![Class Diagram](docs/uml/class-diagram.png) -->
+![Class Diagram](docs/uml/plantuml-diagram.svg)
 
 Source: [`docs/uml/class-diagram.puml`](docs/uml/class-diagram.puml) (11 classes)
 
@@ -182,35 +180,30 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 |---|---|---|---|---|
 | 1 | Librarian hands out a copy (scan → loan + due date) | _link / image_ | Erion Elezaj | Not started |
 | 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | _link / image_ | Elion Elezaj | Not started |
-| 3 | Student returns a book (late → fine; next student in line gets the hold) | _link / image_ | Lorand Pervizaj | Not started |
+| 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | Done |
 | 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
 
-<!-- Example embed:
-### 1. Student Reserves a Book
-![Reserve sequence](docs/uml/seq-reserve.png)
--->
 
 ---
 
 ##  Design Risks & Patterns
 
-> *Minimum 2 risks. Each one: the risk, why it's likely, the pattern that handles it, and where it shows in the class diagram.*
 
-### Risk 1: _TBD_
+### Risk 1: Inconsistent State during Concurrent Access
 | | |
 |---|---|
-| **Why it's likely** | _TBD_ |
-| **Pattern** | _TBD_ |
-| **Where it shows in the UML** | _TBD_ |
-| **SOLID / GRASP link** | _TBD_ |
+| **Why it's likely** | Multiple staff members might try to check out the same physical copy or modify a book's status simultaneously, leading to race conditions. |
+| **Pattern** | Controller / Singleton |
+| **Where it shows in the UML** | `LibraryController` acts as a single point of entry for all domain logic, ensuring operations are coordinated. |
+| **SOLID / GRASP link** | GRASP Controller / Single Responsibility Principle |
 
-### Risk 2: _TBD_
+### Risk 2: High Coupling between Logic and Notification
 | | |
 |---|---|
-| **Why it's likely** | _TBD_ |
-| **Pattern** | _TBD_ |
-| **Where it shows in the UML** | _TBD_ |
-| **SOLID / GRASP link** | _TBD_ |
+| **Why it's likely** | Hard-coding email notifications directly into the loan or reservation logic makes it difficult to change notification methods (e.g., adding SMS) later. |
+| **Pattern** | Pure Fabrication / Dependency Injection |
+| **Where it shows in the UML** | `EmailSender` and `ReminderScheduler` are separated from the core domain classes (`Loan`, `Book`). |
+| **SOLID / GRASP link** | GRASP Pure Fabrication / Dependency Inversion Principle |
 
 ---
 
@@ -245,15 +238,15 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 ## Deliverables & Timeline
 
-| Deliverable | Due | Status |
-|---|---|---|
-| Project description & scope | Mon 26 Oct | ⏳ |
-| Class diagram | Mon 26 Oct | ⏳ |
-| Sequence diagrams | Mon 26 Oct | ⏳ |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ⏳ |
-| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ |
-| GitHub repo link (public) | Mon 26 Oct, midnight | ⏳ |
-| 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ |
+| Deliverable | Due | Status | Completed |
+|---|---|---|---|
+| Project description & scope | Mon 26 Oct | ✅ | Mon 12 Oct |
+| Class diagram | Mon 26 Oct | ✅ | Tue 06 Oct |
+| Sequence diagrams | Mon 26 Oct | ⏳ | In Progress |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Wed 21 Oct |
+| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
+| GitHub repo link (public) | Mon 26 Oct, midnight | ✅ | Wed 14 Oct |
+| 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ | Not Started |
 
 ---
 
