@@ -99,6 +99,7 @@ class Copy {
     + canLendTo(s: Student): boolean
     + isInUse(): boolean
     + getBook(): Book
+    + getStatus(): String
 }
 
 class Loan {
@@ -131,6 +132,7 @@ ReminderScheduler "1" -- "1" EmailSender
 ReminderScheduler "1" -- "1" Catalog
 ReminderScheduler "1" -- "1" LibrarySettings
 ReminderScheduler ..> Loan
+ReminderScheduler ..> Reservation
 
 Catalog "1" *-- "0..*" Book
 Catalog ..> Copy

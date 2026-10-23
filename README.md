@@ -17,17 +17,17 @@
 
 ## 📖 Table of Contents
 
-1. [Overview](#-overview)
-2. [Who Uses It](#-who-uses-it)
-3. [Features](#-features)
-4. [Scope](#-scope)
-5. [Assumptions](#-assumptions)
-6. [Loan Lifecycle](#-loan-lifecycle)
-7. [UML Diagrams](#-uml-diagrams)
-8. [Design Risks & Patterns](#-design-risks--patterns)
-9. [Repository Structure](#-repository-structure)
-10. [Team](#-team)
-11. [Deliverables & Timeline](#-deliverables--timeline)
+1. [Overview](#overview---project-description)
+2. [Who Uses It](#who-uses-it)
+3. [Features](#features)
+4. [Scope](#scope)
+5. [Assumptions](#assumptions)
+6. [Loan Lifecycle](#loan-lifecycle)
+7. [UML Diagrams](#uml-diagrams)
+8. [Design Risks & Patterns](#design-risks--patterns)
+9. [Repository Structure](#repository-structure)
+10. [Team](#team)
+11. [Deliverables & Timeline](#deliverables--timeline)
 
 ---
 
@@ -51,17 +51,17 @@ Librarians also configure the library settings: the loan period, the hold period
 
 ---
 
-##  Who Uses It
+## Who Uses It
 
 | Role | What they do |
 |---|---|
-|  **Student** | Search catalog, check availability, reserve, cancel a reservation, return, view loan, reservation and fine statuses |
-|  **Librarian** | Hand out books, create loans, manage copies, record fine payments, waive fines, add/edit/remove books, mark damaged copies, configure settings (loan period, hold period, fine rate) |
-|  **Assistant Librarian** | Help hand out and return books using scanning, view reservations |
+| **Student** | Search catalog, check availability, reserve, cancel a reservation, return books at the desk, view loan, reservation and fine statuses |
+| **Librarian** | Hand out and take back copies, manage copies and see their status, view reservations and holds, record fine payments, waive fines, add/edit/remove (withdraw) books, mark damaged copies, configure settings (loan period, hold period, fine rate) |
+| **Assistant Librarian** | Hand out and take back copies using scanning, view reservations and holds |
 
 ---
 
-##  Features
+## Features
 
 ### Student
 - [x] Search the digital library catalog
@@ -69,24 +69,26 @@ Librarians also configure the library settings: the loan period, the hold period
 - [x] Reserve a book for loan
 - [x] Cancel a reservation
 - [x] Return a book
-- [x] View loan statuses (including due dates)
+- [x] View the status of their loans (including due dates), reservations and fines
 
 ### Librarian
-- [x] Hand out reserved books and create loans (system records the loan and assigns a due date)
+- [x] Hand out copies, reserved or walk-in (system records the loan and assigns a due date)
 - [x] Track whether books have been returned
 - [x] Manage the number of physical copies per book
-- [x] View the status of individual copies and see which are loaned out
+- [x] View the status of individual copies (available, on hold, on loan, or damaged)
+- [x] View reservations and holds (queue order, each student's position, which copy is held for whom)
 - [x] Waive fines for overdue books (the system calculates them)
 - [x] Record fines paid in person at the desk
 - [x] Add new books (author, title, etc.)
 - [x] Edit book information
-- [x] Remove books, and mark individual physical copies as damaged (taken off the shelf, record kept)
+- [x] Remove books (marked as withdrawn, record kept; not allowed while copies are on loan or on hold, or students are waiting)
+- [x] Mark individual physical copies as damaged (taken off the shelf, record kept; not allowed while on loan)
 - [x] Configure library settings (loan period, hold period, fine rate)
 
 ### Assistant Librarian
 - [x] Assist with handing out and returning books
 - [x] Identify physical copies by scanning
-- [x] View reservations to see which books are reserved
+- [x] View reservations and holds
 
 ---
 
@@ -131,23 +133,25 @@ Librarians also configure the library settings: the loan period, the hold period
 
 ---
 
-##  Loan Lifecycle
+## Loan Lifecycle
 
 ```mermaid
 flowchart LR
-    A[ Search catalog] --> B[✅ Check availability]
-    B --> C[ Reserve]
-    C --> D[ Librarian hands out copy]
-    D --> E[ Loan recorded + due date]
+    A[Search catalog] --> B{Copy on the shelf?}
+    B -- Yes, walk-in --> D[Staff scan the copy]
+    B -- No --> C[Reserve and wait in line]
+    C --> H[Copy put on hold + email]
+    H --> D
+    D --> E[Loan recorded + due date]
     E --> F{Returned on time?}
-    F -- Yes --> G[ Return recorded]
-    F -- No --> H[ Fine imposed]
-    H --> G
+    F -- Yes --> G[Return recorded]
+    F -- No --> I[Fine calculated]
+    I --> G
 ```
 
 ---
 
-##  UML Diagrams
+## UML Diagrams
 
 ### Class Diagram
 
@@ -161,16 +165,16 @@ Source: [`docs/uml/class-diagram.puml`](docs/uml/class-diagram.puml) (11 classes
 | **Domain** | `Student`, `Book`, `Copy`, `Reservation`, `Loan`, `Fine`, `Catalog` | The library itself. `Catalog` holds all books, a `Book` holds its copies and its waiting line of reservations, a `Copy` is lent out in loans, and a late `Loan` creates its `Fine`. |
 | **Helpers** | `LibrarySettings` | Holds the loan period, hold period and fine rate, and does the date and fine calculations, so no number is hard-coded anywhere. |
 | | `EmailSender` | Sends the "your reserved copy is ready" and "your loan is overdue" emails. |
-| | `ReminderScheduler` | Checks once a day for overdue loans and sends the reminders. No library concept fits this job, so it is its own class (GRASP Pure Fabrication). |
+| | `ReminderScheduler` | Runs once a day: emails students with overdue loans, and releases expired holds (the copy goes on hold for the next student in line, or back on the shelf). No library concept fits this job, so it is its own class (GRASP Pure Fabrication). |
 
 **Reading the lines**
 - Solid line: one class keeps a reference to the other (association), with a multiplicity on both ends.
 - Filled diamond: the whole owns the part, and the part cannot exist without it (composition), e.g. `Book` and its `Copy` objects.
-- Dashed arrow: one class only uses the other for a moment, as a parameter or return value (dependency).
+- Dashed arrow: one class only uses the other for a moment, as a parameter or return value (dependency). Only the main dependencies are drawn: where two classes already have an association or composition, that line covers the use, and other parameter or return-type use is visible in the operation signatures.
 
 | File | Owner | Status |
 |---|---|---|
-| `docs/uml/class-diagram.puml` | Erion Elezaj | Draft done, to be reviewed by the team |
+| `docs/uml/class-diagram.puml` | Erion Elezaj | Done |
 
 ### Sequence Diagrams
 
@@ -178,15 +182,15 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 | # | Scenario | Diagram | Owner | Status |
 |---|---|---|---|---|
-| 1 | Librarian hands out a copy (scan → loan + due date) | _link / image_ | Erion Elezaj | Not started |
-| 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | _link / image_ | Elion Elezaj | Not started |
+| 1 | Librarian hands out a copy (scan → loan + due date) | [seq-handing-out-copy.puml](docs/uml/seq-handing-out-copy.puml) | Erion Elezaj | Done |
+| 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | [seq-reserve-book.puml](docs/uml/seq-reserve-book.puml) | Elion Elezaj | Done |
 | 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | Done |
 | 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
 
 
 ---
 
-##  Design Risks & Patterns
+## Design Risks & Patterns
 
 
 ### Risk 1: Inconsistent State during Concurrent Access
@@ -207,11 +211,12 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 ---
 
-##  Repository Structure
+## Repository Structure
 
 ```
 📦 repo
  ┣ 📂 docs
+ ┃ ┣ 📄 expectedDesignRisks  ← design risk notes
  ┃ ┣ 📂 uml          ← PlantUML sources + exported images
  ┃ ┣ 📂 pdf          ← SWEN383_P1_ThePrincipledFour.pdf
  ┃ ┗ 📂 slides       ← 5-minute presentation
@@ -221,7 +226,7 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 ---
 
-##  Team
+## Team
 
 **The Principled Four**
  Each member has their own sequence diagrams they must make, class diagram will be done by Erion as extra
@@ -240,8 +245,8 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 
 | Deliverable | Due | Status | Completed |
 |---|---|---|---|
-| Project description & scope | Mon 26 Oct | ✅ | Mon 12 Oct |
-| Class diagram | Mon 26 Oct | ✅ | Tue 06 Oct |
+| Project description & scope | Mon 26 Oct | ✅ | Mon 19 Oct |
+| Class diagram | Mon 26 Oct | ✅ | Fri 23 Oct |
 | Sequence diagrams | Mon 26 Oct | ⏳ | In Progress |
 | Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Wed 21 Oct |
 | PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
