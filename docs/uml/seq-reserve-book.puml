@@ -1,0 +1,50 @@
+@startuml SequenceReserveBook
+actor Student as Actor
+participant ":LibraryController" as Controller
+participant "b:Book" as Book
+participant "r:Reservation" as Reservation
+participant ":LibrarySettings" as Settings
+participant "s:Student" as Student
+participant ":EmailSender" as Email
+
+Actor -> Controller: reserveBook(s, b)
+activate Controller
+
+Controller -> Book: reserve(s)
+activate Book
+Book -> Reservation: new Reservation(s, today)
+activate Reservation
+Reservation --> Book: r
+deactivate Reservation
+Book --> Controller: r
+deactivate Book
+
+Controller -> Book: findAvailableCopy()
+activate Book
+Book --> Controller: c
+deactivate Book
+
+opt c != null
+    Controller -> Settings: calculateHoldDueDate(today)
+    activate Settings
+    Settings --> Controller: holdDueDate
+    deactivate Settings
+
+    Controller -> Reservation: hold(holdDueDate, c)
+    activate Reservation
+    deactivate Reservation
+
+    Controller -> Student: getEmail()
+    activate Student
+    Student --> Controller: emailAddr
+    deactivate Student
+
+    Controller -> Email: sendTo(emailAddr, "Your reserved copy is ready")
+    activate Email
+    deactivate Email
+end
+
+Controller --> Actor: r
+deactivate Controller
+
+@enduml

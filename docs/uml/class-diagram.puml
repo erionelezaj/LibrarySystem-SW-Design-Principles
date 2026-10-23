@@ -3,7 +3,7 @@
 class LibraryController {
     + search(title: String): Book[]
     + checkAvailability(b: Book): boolean
-    + reserveBook(s: Student, b: Book)
+    + reserveBook(s: Student, b: Book): Reservation
     + cancelReservation(r: Reservation)
     + viewLoans(s: Student): Loan[]
     + viewStudentReservations(s: Student): Reservation[]
@@ -61,6 +61,7 @@ class Book {
     + getReservations(): Reservation[]
     + addCopy(barcode: String): Copy
     + getCopies(): Copy[]
+    + findAvailableCopy(): Copy
     + edit(title: String, author: String)
     + canBeWithdrawn(): boolean
     + withdraw()
