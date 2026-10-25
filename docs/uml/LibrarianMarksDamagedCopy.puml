@@ -1,0 +1,36 @@
+
+@startuml SequenceMarkDamagedCopy
+
+actor Librarian
+
+participant ":LibraryController" as Controller
+participant ":Catalog" as Catalog
+participant "c:Copy" as Copy
+
+Librarian -> Controller: markDamagedCopy(barcode)
+activate Controller
+
+Controller -> Catalog: findCopy(barcode)
+activate Catalog
+Catalog --> Controller: c
+deactivate Catalog
+
+Controller -> Copy: currentLoan()
+activate Copy
+Copy --> Controller: l
+deactivate Copy
+
+alt l != null (copy is on loan)
+    Controller --> Librarian: refused
+
+else l == null (copy is not on loan)
+    Controller -> Copy: markDamaged()
+    activate Copy
+    deactivate Copy
+
+    Controller --> Librarian: copy marked damaged
+end
+
+deactivate Controller
+
+@enduml
