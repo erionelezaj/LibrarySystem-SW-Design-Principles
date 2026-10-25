@@ -25,7 +25,6 @@ deactivate Copy
 
 Controller -> Loan: close(today)
 activate Loan
-Loan --> Controller: returnDate
 deactivate Loan
 
 Controller -> Loan: isOverdue(today)
@@ -33,7 +32,7 @@ activate Loan
 Loan --> Controller: late
 deactivate Loan
 
-alt late is true
+opt late is true
     Controller -> Loan: daysLate(today)
     activate Loan
     Loan --> Controller: days
@@ -60,7 +59,7 @@ activate Book
 Book --> Controller: r
 deactivate Book
 
-alt r != null
+opt r != null
     Controller -> Settings: calculateHoldDueDate(today)
     activate Settings
     Settings --> Controller: holdDueDate
