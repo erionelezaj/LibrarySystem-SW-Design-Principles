@@ -184,7 +184,7 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 |---|---|---|---|---|
 | 1 | Librarian hands out a copy (scan → loan + due date) | [seq-handing-out-copy.puml](docs/uml/seq-handing-out-copy.puml) | Erion Elezaj | Done |
 | 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | [seq-reserve-book.puml](docs/uml/seq-reserve-book.puml) | Elion Elezaj | Done |
-| 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | Done |
+| 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | ✅ Done |
 | 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
 
 
