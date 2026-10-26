@@ -49,16 +49,6 @@ Librarians also configure the library settings: the loan period, the hold period
 
 ---
 
-## Who Uses It
-
-| Role | What they do |
-|---|---|
-| **Student** | Search catalog, check availability, reserve, cancel a reservation, return books at the desk, view loan, reservation and fine statuses |
-| **Librarian** | Hand out and take back copies, manage copies and see their status, view reservations and holds, record fine payments, waive fines, add/edit/remove (withdraw) books, mark damaged copies, configure settings (loan period, hold period, fine rate) |
-| **Assistant Librarian** | Hand out and take back copies using scanning, view reservations and holds |
-
----
-
 ## Features
 
 ### Student
@@ -128,24 +118,6 @@ Librarians also configure the library settings: the loan period, the hold period
 1. Identifying the student at the desk (e.g. scanning a student card) is handled outside our design; the system receives the student who is borrowing.
 2. Every book is identified by its ISBN, and every physical copy by a unique barcode.
 3. Overdue loans and expired holds are checked once a day; the overdue email is sent then, and expired holds are released.
-
----
-
-## Loan Lifecycle
-
-```mermaid
-flowchart LR
-    A[Search catalog] --> B{Copy on the shelf?}
-    B -- Yes, walk-in --> D[Staff scan the copy]
-    B -- No --> C[Reserve and wait in line]
-    C --> H[Copy put on hold + email]
-    H --> D
-    D --> E[Loan recorded + due date]
-    E --> F{Returned on time?}
-    F -- Yes --> G[Return recorded]
-    F -- No --> I[Fine calculated]
-    I --> G
-```
 
 ---
 
@@ -247,7 +219,7 @@ We plan to split it into three controllers, one per group of tasks (one per scre
 | Class diagram | Mon 26 Oct | ✅ | Fri 23 Oct |
 | Sequence diagrams | Mon 26 Oct | ✅ | Sun 25 Oct |
 | Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Sun 25 Oct |
-| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
+| PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ✅ | Sun 25 Oct |
 | GitHub repo link (public) | Mon 26 Oct, midnight | ⏳ | Repo still private |
 | 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ | Not Started |
 
