@@ -18,16 +18,14 @@
 ## 📖 Table of Contents
 
 1. [Overview](#overview---project-description)
-2. [Who Uses It](#who-uses-it)
-3. [Features](#features)
-4. [Scope](#scope)
-5. [Assumptions](#assumptions)
-6. [Loan Lifecycle](#loan-lifecycle)
-7. [UML Diagrams](#uml-diagrams)
-8. [Design Risks & Patterns](#design-risks--patterns)
-9. [Repository Structure](#repository-structure)
-10. [Team](#team)
-11. [Deliverables & Timeline](#deliverables--timeline)
+2. [Features](#features)
+3. [Scope](#scope)
+4. [Assumptions](#assumptions)
+5. [UML Diagrams](#uml-diagrams)
+6. [Design Risks & Patterns](#design-risks--patterns)
+7. [Repository Structure](#repository-structure)
+8. [Team](#team)
+9. [Deliverables & Timeline](#deliverables--timeline)
 
 ---
 
