@@ -47,8 +47,6 @@ Once a day, the system checks for overdue loans and emails the students who have
 
 Librarians also configure the library settings: the loan period, the hold period, and the fine rate.
 
-> The catalog is digital, but the books are physical. A reservation is only a request. The librarian or assistant librarian physically hands the book over, and that's the moment the loan starts.
-
 ---
 
 ## Who Uses It
