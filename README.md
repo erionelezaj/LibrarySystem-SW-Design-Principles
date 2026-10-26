@@ -184,30 +184,31 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 |---|---|---|---|---|
 | 1 | Librarian hands out a copy (scan → loan + due date) | [seq-handing-out-copy.puml](docs/uml/seq-handing-out-copy.puml) | Erion Elezaj | Done |
 | 2 | Student reserves a book (copy free → hold + email; no copy → waiting line) | [seq-reserve-book.puml](docs/uml/seq-reserve-book.puml) | Elion Elezaj | Done |
-| 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | ✅ Done |
-| 4 | Librarian marks a damaged copy (refused if the copy is on loan) | _link / image_ | Dren Veliu | Not started |
+| 3 | Student returns a book (late → fine; next student in line gets the hold) | [seq-return.puml](docs/uml/seq-return.puml) | Lorand Pervizaj | Done |
+| 4 | Librarian marks a damaged copy (refused if the copy is on loan) | [seq-mark-damaged-copy.puml](docs/uml/seq-mark-damaged-copy.puml) | Dren Veliu | Done |
 
 
 ---
 
 ## Design Risks & Patterns
 
+### Design Risk 1: Email is hard-wired into the system
 
-### Risk 1: Inconsistent State during Concurrent Access
-| | |
-|---|---|
-| **Why it's likely** | Multiple staff members might try to check out the same physical copy or modify a book's status simultaneously, leading to race conditions. |
-| **Pattern** | Controller / Singleton |
-| **Where it shows in the UML** | `LibraryController` acts as a single point of entry for all domain logic, ensuring operations are coordinated. |
-| **SOLID / GRASP link** | GRASP Controller / Single Responsibility Principle |
+Right now `LibraryController` and `ReminderScheduler` both call `EmailSender` directly, as the two "1" -- "1" links in the class diagram show. That works as long as we only ever send email through one provider. But SMS and push notifications are out of scope for now, not forever, and the library could also switch to an email provider with a different API. Either change would mean editing both classes.
 
-### Risk 2: High Coupling between Logic and Notification
-| | |
-|---|---|
-| **Why it's likely** | Hard-coding email notifications directly into the loan or reservation logic makes it difficult to change notification methods (e.g., adding SMS) later. |
-| **Pattern** | Pure Fabrication / Dependency Injection |
-| **Where it shows in the UML** | `EmailSender` and `ReminderScheduler` are separated from the core domain classes (`Loan`, `Book`). |
-| **SOLID / GRASP link** | GRASP Pure Fabrication / Dependency Inversion Principle |
+We plan to use the **Adapter** pattern. The controller and the scheduler would talk to a `NotificationSender` interface instead of `EmailSender`, and an `EmailAdapter` would wrap the actual provider. Adding SMS later would then just mean adding one more adapter, without touching the classes that send notifications. This follows the Dependency Inversion and Open/Closed principles, and protects the system from changes in how we notify students (Protected Variations).
+
+### Design Risk 2: Two copies of the library settings
+
+`LibrarySettings` holds the loan period, hold period and fine rate, and both `LibraryController` and `ReminderScheduler` use it. Librarians can change these settings while the system is running. If the controller and the scheduler each ended up with their own `LibrarySettings` object, a change made at the desk wouldn't reach the scheduler. For example, a librarian changes the hold period from 3 to 5 days, but holds passed on by the scheduler overnight still get 3. The class diagram shows that both classes need the settings, but it can't show whether they share the same object.
+
+We plan to use the **Singleton** pattern. We will create one instance of `LibrarySettings`, and every class that needs the settings uses that same instance. It is created once at start-up and passed to the controller and the scheduler (Dependency Injection). That way there is only ever one set of library rules, and a change made at the desk is what the scheduler sees.
+
+### Design Risk 3: One controller doing everything
+
+`LibraryController` receives every request in the system, from the student's screen, the desk and the librarian's tools, so it has 19 operations covering searching, reservations, lending, returns, fines, books, copies and settings. It doesn't do the work itself (it passes everything on to the domain classes), but it mixes several unrelated groups of tasks in one class, and every new feature would make it bigger.
+
+We plan to split it into three controllers, one per group of tasks (one per screen): a `StudentController` for searching and reservations, a `CirculationController` for lending, returns and fines, and a `CollectionController` for books, copies and settings. This follows the GRASP Controller principle (a controller per use case or session) and keeps each class focused (High Cohesion).
 
 ---
 
@@ -216,7 +217,6 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 ```
 📦 repo
  ┣ 📂 docs
- ┃ ┣ 📄 expectedDesignRisks  ← design risk notes
  ┃ ┣ 📂 uml          ← PlantUML sources + exported images
  ┃ ┣ 📂 pdf          ← SWEN383_P1_ThePrincipledFour.pdf
  ┃ ┗ 📂 slides       ← 5-minute presentation
@@ -247,10 +247,10 @@ Each sequence diagram starts with the actor sending a request to `:LibraryContro
 |---|---|---|---|
 | Project description & scope | Mon 26 Oct | ✅ | Mon 19 Oct |
 | Class diagram | Mon 26 Oct | ✅ | Fri 23 Oct |
-| Sequence diagrams | Mon 26 Oct | ⏳ | In Progress |
-| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Wed 21 Oct |
+| Sequence diagrams | Mon 26 Oct | ✅ | Sun 25 Oct |
+| Design risks + patterns (≥ 2) | Mon 26 Oct | ✅ | Sun 25 Oct |
 | PDF: `SWEN383_P1_ThePrincipledFour.pdf` | Mon 26 Oct, midnight | ⏳ | Not Started |
-| GitHub repo link (public) | Mon 26 Oct, midnight | ✅ | Wed 14 Oct |
+| GitHub repo link (public) | Mon 26 Oct, midnight | ⏳ | Repo still private |
 | 5-minute presentation | Wed 28 / Thu 29 Oct | ⏳ | Not Started |
 
 ---

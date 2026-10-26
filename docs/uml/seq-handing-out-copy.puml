@@ -11,26 +11,39 @@ participant ":LibrarySettings"  as settings
 
 
 Librarian -> controller: lendCopy(barcode, s)
+activate controller
 
 controller -> catalog: findCopy(barcode)
+activate catalog
 catalog --> controller: c
+deactivate catalog
 
 controller -> copy: canLendTo(s)
+activate copy
 copy --> controller: canLend
+deactivate copy
 
 alt  can lend
     controller -> settings: calculateLoanDueDate(today)
+    activate settings
     settings --> controller: dueDate
+    deactivate settings
 
     controller -> copy: lendTo(s, dueDate)
+    activate copy
     copy -> loan: new Loan(s, dueDate)
+    activate loan
     loan --> copy: l
+    deactivate loan
 
     opt copy was on hold for this student
         copy  -> reservation: complete()
+        activate reservation
+        deactivate reservation
     end
 
     copy --> controller: l
+    deactivate copy
 
     controller --> Librarian: l
 
@@ -40,5 +53,6 @@ else  can't lend
     controller --> Librarian: refused
 end
 
+deactivate controller
 
 @enduml
