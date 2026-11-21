@@ -1,7 +1,7 @@
 @startuml HandingOutCopy
 actor Librarian
 
-participant ":LibraryController" as controller
+participant ":CirculationController" as controller
 participant ":Catalog" as catalog
 participant "c:Copy" as copy
 participant ":Reservation" as reservation

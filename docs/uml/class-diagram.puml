@@ -1,18 +1,6 @@
 @startuml LibrarySystem
 
-class LibraryController {
-    + search(title: String): Book[]
-    + checkAvailability(b: Book): boolean
-    + reserveBook(s: Student, b: Book): Reservation
-    + cancelReservation(r: Reservation)
-    + viewLoans(s: Student): Loan[]
-    + viewStudentReservations(s: Student): Reservation[]
-    + lendCopy(barcode: String, s: Student): Loan
-    + returnCopy(barcode: String): Fine
-    + viewFines(s: Student): Fine[]
-    + payFine(f: Fine)
-    + waiveFine(f: Fine)
-    + viewBookReservations(isbn: String): Reservation[]
+class CollectionController {
     + addBook(title: String, isbn: String, author: String)
     + editBook(isbn: String, title: String, author: String)
     + removeBook(isbn: String)
@@ -20,6 +8,26 @@ class LibraryController {
     + markDamagedCopy(barcode: String)
     + viewCopies(isbn: String): Copy[]
     + changeSettings(loanPeriod: int, holdPeriod: int, fineRate: double)
+}
+
+class StudentController {
+    + search(title: String): Book[]
+    + checkAvailability(b: Book): boolean
+    + viewStudentReservations(s: Student): Reservation[]
+    + reserveBook(s: Student, b: Book): Reservation
+    + cancelReservation(r: Reservation)
+    + viewLoans(s: Student): Loan[]
+    + viewFines(s: Student): Fine[]
+
+}
+
+class CirculationController {
+    + lendCopy(barcode: String, s: Student): Loan
+    + returnCopy(barcode: String): Fine
+    + viewFines(s: Student): Fine[]
+    + waiveFine(f: Fine)
+    + payFine(f: Fine)
+    + viewBookReservations(isbn: String): Reservation[]
 }
 
 class ReminderScheduler {
@@ -41,9 +49,11 @@ class Catalog {
 }
 
 class LibrarySettings {
+    - {static}instance: LibrarySettings
     - loanPeriod: int
     - holdPeriod: int
     - fineRate: double
+    + {static} getInstance(): LibrarySettings
     + update(loanPeriod: int, holdPeriod: int, fineRate: double)
     + calculateLoanDueDate(start: Date): Date
     + calculateHoldDueDate(start: Date): Date
@@ -85,8 +95,8 @@ class Reservation {
     + expire(today: Date)
     + cancel()
     + getStudent(): Student
-    + complete() 
-    + getCopy(): Copy   
+    + complete()
+    + getCopy(): Copy
 }
 
 class Copy {
@@ -122,11 +132,23 @@ class Fine {
 }
 
 
-LibraryController "1" -- "1" EmailSender
-LibraryController "1" -- "1" Catalog
-LibraryController "1" -- "1" LibrarySettings
-LibraryController ..> Book
-LibraryController ..> Copy
+StudentController "1" -- "1" EmailSender
+CirculationController "1" -- "1" EmailSender
+
+StudentController "1" -- "1" Catalog
+CirculationController "1" -- "1" Catalog
+CollectionController "1" -- "1" Catalog
+
+StudentController "1" -- "1" LibrarySettings
+CirculationController "1" -- "1" LibrarySettings
+CollectionController "1" -- "1" LibrarySettings
+
+
+StudentController ..> Book
+
+
+CollectionController ..> Copy
+CirculationController ..> Copy
 
 ReminderScheduler "1" -- "1" EmailSender
 ReminderScheduler "1" -- "1" Catalog
