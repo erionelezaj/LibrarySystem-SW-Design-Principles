@@ -53,6 +53,7 @@ class LibrarySettings {
     - loanPeriod: int
     - holdPeriod: int
     - fineRate: double
+    - addDays(start: Date, days: int): Date 
     + {static} getInstance(): LibrarySettings
     + update(loanPeriod: int, holdPeriod: int, fineRate: double)
     + calculateLoanDueDate(start: Date): Date
