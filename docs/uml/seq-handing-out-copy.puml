@@ -18,6 +18,8 @@ activate catalog
 catalog --> controller: c
 deactivate catalog
 
+alt copy was found
+
 controller -> copy: canLendTo(s)
 activate copy
 copy --> controller: canLend
@@ -52,6 +54,10 @@ alt  can lend
 else  can't lend
     controller --> Librarian: refused
 end
+
+else copy was not found
+    controller --> Librarian: refused
+end    
 
 deactivate controller
 
