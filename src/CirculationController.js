@@ -22,14 +22,44 @@ export class CirculationController {
         }
     }
     returnCopy(barcode) {
-        // Lorand's part
+        const copy = this.catalog.findCopy(barcode);
+        if (!copy) {
+            return null;
+        }
+        const loan = copy.currentLoan();
+        if (!loan || loan.returnedDate) {
+            return null;
+        }
+        const today = new Date();
+        loan.close(today);
+
+        let fine = null;
+        if (loan.isOverdue(today)) {
+            const amount = this.settings.calculateFine(loan.daysLate(today));
+            fine = loan.createFine(amount);
+        }
+
+        const next = copy.getBook().nextReservation();
+        if (next) {
+            const holdDueDate = this.settings.calculateHoldDueDate(today);
+            next.hold(holdDueDate, copy);
+            this.notifier.notify(next);
+        }
+
+        return fine;
     }
 
     waiveFine(fine) {
-        // Lorand's part
+        if (!fine) {
+            return false;
+        }
+        return fine.waive();
     }
     payFine(fine) {
-        // Lorand's part
+        if (!fine) {
+            return false;
+        }
+        return fine.pay();
     }
 
     viewFines(student) {
