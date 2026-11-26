@@ -1,8 +1,11 @@
 import assert from "node:assert";
 import { CirculationController } from "../src/CirculationController.js";
+import { Loan } from "../src/Loan.js";
+import { EmailAdapter } from "../src/EmailAdapter.js";
+import { EmailService } from "../src/EmailService.js";
 import { Fine } from "../src/Fine.js";
 import { LibrarySettings } from "../src/LibrarySettings.js";
-import { FakeBook, FakeCatalog, FakeNotifier, FakeStudent } from "./fakes.js";
+import { TestHoldNotifier, FakeBook, FakeCatalog, FakeNotifier, FakeStudent } from "./fakes.js";
 
 function setup() {
     const settings = LibrarySettings.getInstance();
@@ -10,6 +13,7 @@ function setup() {
     const notifier = new FakeNotifier();
     const controller = new CirculationController(catalog, settings, notifier);
     const book = catalog.addBook(new FakeBook("Refactoring", "978-1"));
+    book.subscribe(notifier);
     const copy = book.addCopy("C-1");
     const sara = new FakeStudent("Sara", "sara@rit.edu");
     return { settings, catalog, notifier, controller, book, copy, sara };
@@ -139,3 +143,57 @@ function startOfDay(date) {
 }
 
 console.log("circulation.test.js: all assertions passed");
+
+// Partial integration: real Loan on-time path, domain collaborators remain doubles.
+{
+    const { controller, copy, sara } = setup();
+    const loan = new Loan(sara, LibrarySettings.getInstance().addDays(new Date(), 2));
+    copy.loan = loan;
+    assert.strictEqual(controller.returnCopy("C-1"), null);
+    assert.ok(loan.returnedDate);
+}
+
+// Real Loan currently cannot create a fine: fail visibly BEFORE closing.
+{
+    const { controller, copy, book, sara } = setup();
+    const loan = new Loan(sara, LibrarySettings.getInstance().addDays(new Date(), -3));
+    copy.loan = loan;
+    const waiting = book.reserve(sara);
+    book.subscribe({ notify() { assert.fail("blocked late return must not notify"); } });
+    assert.throws(() => controller.returnCopy("C-1"), /must attach and return a Fine/);
+    assert.strictEqual(loan.returnedDate, null);
+    assert.strictEqual(waiting.status, "waiting");
+    assert.strictEqual(loan.fine, undefined);
+    console.log("REAL LOAN BLOCKER reproduced: createFine returns no Fine; return left open");
+}
+
+// Subscription dispatch and real Adapter/provider translation after a return.
+{
+    const { controller, copy, book, sara } = setup();
+    const service = new EmailService("library@example.org");
+    book.subscribe(new TestHoldNotifier(new EmailAdapter(service)));
+    book.subscribe({ notify(r) { assert.strictEqual(r.getCopy(), copy); assert.strictEqual(r.status, "on hold"); } });
+    const skipped = book.reserve(sara);
+    skipped.cancel();
+    const waiting = book.reserve(sara);
+    controller.lendCopy("C-1", sara);
+    controller.returnCopy("C-1");
+    assert.strictEqual(waiting.status, "on hold");
+    assert.strictEqual(skipped.status, "cancelled");
+    assert.strictEqual(service.outbox.length, 1);
+    assert.deepStrictEqual(service.outbox[0].recipients, [sara.getEmail()]);
+    controller.returnCopy("C-1");
+    assert.strictEqual(service.outbox.length, 1);
+}
+
+// Failed holds must not emit a Subject event.
+for (const throws of [false, true]) {
+    const { controller, book, sara } = setup();
+    const waiting = book.reserve(sara);
+    waiting.hold = () => { if (throws) throw new Error("hold failed"); return false; };
+    book.subscribe({ notify() { assert.fail("failed hold must not notify"); } });
+    controller.lendCopy("C-1", sara);
+    if (throws) assert.throws(() => controller.returnCopy("C-1"), /hold failed/);
+    else controller.returnCopy("C-1");
+}
+console.log("circulation contract and partial real-Loan integration checks passed");

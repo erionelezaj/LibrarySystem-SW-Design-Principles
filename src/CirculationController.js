@@ -31,19 +31,23 @@ export class CirculationController {
             return null;
         }
         const today = new Date();
-        loan.close(today);
-
         let fine = null;
         if (loan.isOverdue(today)) {
             const amount = this.settings.calculateFine(loan.daysLate(today));
             fine = loan.createFine(amount);
+            if (!fine) {
+                throw new Error("Loan.createFine(amount) must attach and return a Fine before a late return can close");
+            }
         }
+        loan.close(today);
 
-        const next = copy.getBook().nextReservation();
+        const book = copy.getBook();
+        const next = book.nextReservation();
         if (next) {
             const holdDueDate = this.settings.calculateHoldDueDate(today);
-            next.hold(holdDueDate, copy);
-            this.notifier.notify(next);
+            if (next.hold(holdDueDate, copy) !== false) {
+                book.notify(next);
+            }
         }
 
         return fine;
