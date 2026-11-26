@@ -12,7 +12,9 @@ Proposed payload pending Elion's confirmation: notify(reservation) forwards that
 
 The sequence is nextReservation() → reservation.hold(holdDueDate, copy) → book.notify(reservation). hold() must associate the copy and make it unavailable before returning; false means refusal, void means success, and an exception stops notification. Both return and expiry workflows follow this contract. Book chooses the first waiting reservation; clients must not reproduce queue filtering. Reservation.expire(today) must release the copy before the next hold is attempted. Confirm this contract with Elion before integration.
 
-Erion: retain existing constructor argument counts for compatibility for now, but the legacy notifier arguments are unused by Lorand's methods. Wire NotificationSender into the scheduler for overdue reminders, and into HoldNotifier for hold messages. Removing unused constructor parameters requires agreement because the controller constructor is yours.
+Scheduler wiring is now `new ReminderScheduler(catalog, settings, sender)`; its unused fourth notifier parameter was removed after checking the shared diagram and published teammate call sites. The reminder helper is `wasRemindedToday(loan, today)`; it was not part of the shared diagram. Register HoldNotifier through `book.subscribe(holdNotifier)`.
+
+Erion: your `CirculationController(catalog, settings, notifier)` constructor and `this.notifier` remain unchanged. Proposed change for your approval: `constructor(catalog, settings) { this.catalog = catalog; this.settings = settings; }`, with wiring `new CirculationController(catalog, settings)`. Do not apply that controller change until approved. HoldNotifier receives the shared sender; the controller reaches it through Book subscriptions.
 
 ## Fine creation — blocker for Erion
 
@@ -38,8 +40,8 @@ Update the shared class diagram and SVG: NotificationSender Target; EmailAdapter
 
 ## Validation and branch placement
 
-Adapter/Fine tests use real own classes. Scheduler and return workflow tests use temporary Book/Copy/Reservation/Catalog/Student/Observer doubles. Real Loan tests expose the empty createFine blocker. A passing double-based workflow is not full integration. Run every tests/*.test.js with Node after integration. Test actual queues, holds and Observer delivery again once owner classes land, then run the website.
+Adapter/Fine tests use real own classes. Scheduler and return workflow tests use temporary Book/Copy/Reservation/Catalog/Student/Observer doubles. Real Loan tests expose the empty createFine blocker. A passing double-based workflow is not full integration. Development tests are preserved locally in `tests/` and backed up in `.local-verification/tests/`; neither directory is submitted. Run local `tests/*.test.js` with Node after integration, replacing doubles with real classes wherever available. Keep integration tests local unless the team agrees to commit them. Test actual queues, holds and Observer delivery again once owner classes land, then run the website.
 
-Shared scheduler, doubles and documentation corrections belong to feature/lorand-part2 (PR #5). Controller methods and circulation tests belong to feature/lorand-circulation-return (PR #6, based on #5). Neither PR should be merged until blockers are resolved and Elion reviews the Observer contract.
+Shared production and documentation changes belong to feature/lorand-part2 (PR #5). Controller methods belong to feature/lorand-circulation-return (PR #6, based on #5). The five temporary test files are removed from the final PR diffs by ordinary cleanup commits; their historical commits remain intact. Neither PR should be merged until blockers are resolved and Elion reviews the Observer contract.
 
-GitHub associates the existing Guy / lorand.pervizaj@gmail.com commits with LorandPervizaj. Identity and commit history are unchanged. PR descriptions still describe the old direct notifier design until updated; use these notes for the corrected contract.
+GitHub associates the existing Guy / lorand.pervizaj@gmail.com commits with LorandPervizaj. Identity and commit history are unchanged. Both PR descriptions reflect the corrected Book Subject flow and current integration blockers.

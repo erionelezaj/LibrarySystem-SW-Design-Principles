@@ -12,11 +12,11 @@ Real Loan.createFine() is empty. The corrected controller verifies its result be
 
 Notification translation remains in EmailAdapter. Clients use sendTo() rather than the concrete provider. Book owns queue selection, Reservation owns hold/expiry transitions, Loan must own Fine creation, and Fine owns settlement transitions. Controllers coordinate these responsibilities. No new production helper classes were added. The two use cases each coordinate hold assignment; queue filtering and message formatting are not copied into them.
 
-Business policy values remain in LibrarySettings. Scheduler calendar comparison now delegates to pending LibrarySettings.isSameDay(); production deduplication is BLOCKED until Erion implements it. Existing Loan date arithmetic also violates the requested settings-only rule and requires Erion's change. Constructor signatures remain unchanged; removing unused notifier arguments requires owner agreement.
+Business policy values remain in LibrarySettings. Scheduler calendar comparison now delegates to pending LibrarySettings.isSameDay(); production deduplication is BLOCKED until Erion implements it. Existing Loan date arithmetic also violates the requested settings-only rule and requires Erion's change. ReminderScheduler now takes (catalog, settings, sender); its internal helper is wasRemindedToday(). The controller constructor remains unchanged pending Erion's approval.
 
 ## Unit and contract tests
 
-Run node tests/adapter.test.js, node tests/fine.test.js and node tests/scheduler.test.js on the Part 2 branch; also node tests/circulation.test.js on the stacked controller branch. All executed assertions pass, including expected failures that demonstrate missing integration contracts. Coverage includes Adapter translation, payment/waiver and refused repeat settlement, same-day and next-day reminders, return queues, expired holds, refused/throwing holds, and Subject dispatch to multiple observers. Domain/Observer doubles are explicitly temporary.
+The five development test files are kept locally in tests/ with a backup in .local-verification/tests/, excluded from Git tracking and the final PR diffs through ordinary cleanup commits. Run node tests/adapter.test.js, node tests/fine.test.js, node tests/scheduler.test.js and node tests/circulation.test.js locally against the stacked controller branch. All executed assertions pass, including expected failures that demonstrate missing integration contracts. Coverage includes Adapter translation, payment/waiver and refused repeat settlement, same-day and next-day reminders, return queues, expired holds, refused/throwing holds, and Subject dispatch to multiple observers. Domain/Observer doubles are explicitly temporary.
 
 ## Partial integration tests
 
@@ -28,7 +28,7 @@ Not run: no HTML entry point or renderer implementation exists. Test actual lend
 
 ## Documentation check
 
-Adapter report shortened to approximately one page of prose (pagination depends on the final report template), with actual README/class-diagram evidence, translation details, benefits and trade-offs. Unsupported personal approval claims were removed. Return UML now includes the Book Subject, fine failure branch and pending owner contracts; semantic comparison was performed against the controller code, but no new PlantUML rendering is claimed. Defense guide explains subscriptions and distinguishes actual implementation from doubles.
+Adapter report contains the actual EmailAdapter source snippet and approximately one page of text (pagination depends on the final report template), with actual README/class-diagram evidence, translation details, benefits and trade-offs. Unsupported personal approval claims were removed. Return UML now includes the Book Subject, fine failure branch and pending owner contracts; semantic comparison was performed against the controller code, but no new PlantUML rendering is claimed. Defense guide explains subscriptions and distinguishes actual implementation from doubles.
 
 ## Git and readiness check
 

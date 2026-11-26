@@ -1,3 +1,5 @@
+> Development tests are local only in `tests/`, backed up in `.local-verification/tests/`, and excluded from the submitted PR changes.
+
 > Review status: Book, HoldObserver and HoldNotifier are missing. Book.subscribe(observer) and Book.notify(reservation) forwarding to observer.notify(reservation) are proposed contracts, exercised only with temporary doubles. Loan.createFine is empty; corrected returns throw before closing when no fine is created. LibrarySettings.isSameDay is also pending. No full integration or browser success is claimed.
 
 # Defense study guide — Lorand Pervizaj (The Principled Four)
@@ -36,6 +38,7 @@ never calculated here: `LibrarySettings.calculateFine(daysLate)` produces it and
 must attach it (currently a stub; composition `Loan *-- Fine`).
 
 ### `ReminderScheduler` — the daily job
+Receives `(catalog, settings, sender)`; `wasRemindedToday(loan, today)` checks the local reminder record.
 - `checkOverdueLoans(today)`: asks `Catalog.findOverdueLoans(today)`, skips returned or not-overdue loans,
   skips anything already reminded today (it keeps a small `overdueNotices` record of loan + day, using the pending settings.isSameDay helper), and sends
   one message per loan per day through the injected `NotificationSender`.

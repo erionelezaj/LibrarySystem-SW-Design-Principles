@@ -12,7 +12,7 @@ export class EmailService {
             body: mail.body
         };
         this.outbox.push(record);
-        console.log(`[EmailService] from=${record.from} to=${record.recipients.join(", ")} subject="${record.subject}" body="${record.body}"`);
+        console.log("Email to", record.recipients.join(", "), record.subject, record.body);
         return record;
     }
 }

@@ -1,9 +1,8 @@
 export class ReminderScheduler {
-    constructor(catalog, settings, sender, notifier) {
+    constructor(catalog, settings, sender) {
         this.catalog = catalog;
         this.settings = settings;
         this.sender = sender;
-        // Legacy notifier argument retained until team wiring is updated.
         this.overdueNotices = [];
     }
 
@@ -16,7 +15,7 @@ export class ReminderScheduler {
             if (!loan.isOverdue(today)) {
                 continue;
             }
-            if (this.wasNoticed(loan, today)) {
+            if (this.wasRemindedToday(loan, today)) {
                 continue;
             }
             const student = loan.getStudent();
@@ -45,7 +44,7 @@ export class ReminderScheduler {
         }
     }
 
-    wasNoticed(loan, today) {
+    wasRemindedToday(loan, today) {
         return this.overdueNotices.some(entry =>
             entry.loan === loan && this.settings.isSameDay(entry.day, today));
     }
