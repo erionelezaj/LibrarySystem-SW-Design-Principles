@@ -145,3 +145,9 @@ for (const throws of [false, true]) {
     else job.checkExpiredHolds(today);
 }
 console.log("scheduler Observer contract tests passed (domain/Observer doubles)");
+
+// Real settings still lack the required calendar helper: expose the dependency.
+const realSettingsJob = new ReminderScheduler(catalog, LibrarySettings.getInstance(), new FakeSender());
+realSettingsJob.checkOverdueLoans(today);
+assert.throws(() => realSettingsJob.checkOverdueLoans(today), /isSameDay/);
+console.log("REAL SETTINGS BLOCKER reproduced: isSameDay is missing");
