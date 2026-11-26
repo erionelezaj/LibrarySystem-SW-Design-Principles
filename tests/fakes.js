@@ -1,5 +1,6 @@
 import { Loan } from "../src/Loan.js";
 import { Fine } from "../src/Fine.js";
+import { LibrarySettings } from "../src/LibrarySettings.js";
 
 // Loan.createFine() is still an empty stub in src/Loan.js, which Erion owns.
 // TestLoan mirrors the implementation Erion has to add, so the return workflow
@@ -108,6 +109,15 @@ export class FakeBook {
         this.isbn = isbn;
         this.reservations = [];
         this.copies = [];
+        this.observers = [];
+    }
+    subscribe(observer) {
+        this.observers.push(observer);
+    }
+    notify(reservation) {
+        for (const observer of this.observers) {
+            observer.notify(reservation);
+        }
     }
     reserve(student) {
         const reservation = new FakeReservation(student);
@@ -193,5 +203,22 @@ export class FakeSender {
     }
     sendTo(to, message) {
         this.messages.push({ to: to, message: message });
+    }
+}
+
+// Proposed settings interface: temporary double, not real integration evidence.
+export function testSettings() {
+    const settings = Object.create(LibrarySettings.getInstance());
+    settings.isSameDay = (first, second) =>
+        first.getFullYear() === second.getFullYear() &&
+        first.getMonth() === second.getMonth() && first.getDate() === second.getDate();
+    return settings;
+}
+
+// Temporary concrete Observer until Elion supplies HoldObserver / HoldNotifier.
+export class TestHoldNotifier {
+    constructor(sender) { this.sender = sender; }
+    notify(reservation) {
+        this.sender.sendTo(reservation.getStudent().getEmail(), "Your reserved copy is ready");
     }
 }

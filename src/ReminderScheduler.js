@@ -3,7 +3,7 @@ export class ReminderScheduler {
         this.catalog = catalog;
         this.settings = settings;
         this.sender = sender;
-        this.notifier = notifier;
+        // Legacy notifier argument retained until team wiring is updated.
         this.overdueNotices = [];
     }
 
@@ -22,7 +22,7 @@ export class ReminderScheduler {
             const student = loan.getStudent();
             const message = `Your loan was due on ${loan.dueDate.toDateString()} and is overdue. Please return it to the library.`;
             this.sender.sendTo(student.getEmail(), message);
-            this.overdueNotices.push({ loan: loan, day: today.toDateString() });
+            this.overdueNotices.push({ loan: loan, day: new Date(today) });
         }
     }
 
@@ -34,17 +34,19 @@ export class ReminderScheduler {
             if (!copy) {
                 continue;
             }
-            const next = copy.getBook().nextReservation();
+            const book = copy.getBook();
+            const next = book.nextReservation();
             if (next) {
                 const holdDueDate = this.settings.calculateHoldDueDate(today);
-                next.hold(holdDueDate, copy);
-                this.notifier.notify(next);
+                if (next.hold(holdDueDate, copy) !== false) {
+                    book.notify(next);
+                }
             }
         }
     }
 
     wasNoticed(loan, today) {
-        const day = today.toDateString();
-        return this.overdueNotices.find(entry => entry.loan === loan && entry.day === day) !== undefined;
+        return this.overdueNotices.some(entry =>
+            entry.loan === loan && this.settings.isSameDay(entry.day, today));
     }
 }

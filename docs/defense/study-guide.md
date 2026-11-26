@@ -1,3 +1,5 @@
+> Review status: Book, HoldObserver and HoldNotifier are missing. Book.subscribe(observer) and Book.notify(reservation) forwarding to observer.notify(reservation) are proposed contracts, exercised only with temporary doubles. Loan.createFine is empty; corrected returns throw before closing when no fine is created. LibrarySettings.isSameDay is also pending. No full integration or browser success is claimed.
+
 # Defense study guide — Lorand Pervizaj (The Principled Four)
 
 Personal preparation material for the SWEN-383 Part 2 defense (7 December 2026). Not part of the final
@@ -35,20 +37,20 @@ attaches it (composition `Loan *-- Fine`).
 
 ### `ReminderScheduler` — the daily job
 - `checkOverdueLoans(today)`: asks `Catalog.findOverdueLoans(today)`, skips returned or not-overdue loans,
-  skips anything already reminded today (it keeps a small `overdueNotices` record of loan + day), and sends
+  skips anything already reminded today (it keeps a small `overdueNotices` record of loan + day, using the pending settings.isSameDay helper), and sends
   one message per loan per day through the injected `NotificationSender`.
 - `checkExpiredHolds(today)`: asks `Catalog.findExpiredHolds(today)`, for each one captures the copy, calls
   `reservation.expire(today)` (which releases the copy), then `copy.getBook().nextReservation()`; if a student
   is waiting it computes `settings.calculateHoldDueDate(today)`, assigns the hold and calls
-  `notifier.notify(reservation)`.
+  `book.notify(reservation)`.
 *Why here:* no domain concept means "run once a day" — GRASP Pure Fabrication keeps that out of `Loan`,
 `Reservation` and `Book`.
 
 ### My three methods in `CirculationController` (Erion's file, isolated branch)
 - `returnCopy(barcode)`: find copy → find active loan → refuse if either is missing or the loan is already
-  returned → `loan.close(today)` → if overdue, `settings.calculateFine(loan.daysLate(today))` and
+  returned → if overdue, create and verify the fine before `loan.close(today)` →, `settings.calculateFine(loan.daysLate(today))` and
   `loan.createFine(amount)` → `copy.getBook().nextReservation()` → if someone is waiting,
-  `settings.calculateHoldDueDate(today)`, `reservation.hold(...)`, then `notifier.notify(reservation)` →
+  `settings.calculateHoldDueDate(today)`, `reservation.hold(...)`, then `book.notify(reservation)` →
   return the `Fine` (or `null`).
 - `payFine(fine)` / `waiveFine(fine)`: refuse if there is no fine, otherwise delegate to `fine.pay()` /
   `fine.waive()` and return its result.
@@ -87,7 +89,7 @@ start as Adapter-per-channel, and a Strategy could sit above it.)
 **Observer + Adapter together:** Observer answers *that* someone must be notified and *who* (a hold was
 assigned → the student behind that reservation). Adapter answers *how* the message reaches a particular
 provider. Chain in our code:
-`returnCopy()` → `notifier.notify(reservation)` → `HoldNotifier` (gets the student's email) →
+`returnCopy()` → `Book.notify(reservation)` → subscribed `HoldObserver` → `HoldNotifier` (gets the student's email) →
 `EmailAdapter.sendTo(email, message)` → `EmailService.deliver({...})`.
 
 **Introducing a different provider:** write `SMSGateway` with its own interface plus `SmsAdapter extends
@@ -110,7 +112,7 @@ three collaborators instead of one class with 19 operations and every collaborat
 cohesion, and a change to reservations cannot destabilize copy management.
 
 **GRASP cheat sheet with our examples:** Controller (the three controllers), Information Expert (`Fine` decides
-settlement, `Loan` computes days late, `LibrarySettings` the rate), Pure Fabrication (`ReminderScheduler`),
+settlement, `Loan` exposes days late (date arithmetic must move to settings), `LibrarySettings` the rate), Pure Fabrication (`ReminderScheduler`),
 Protected Variations (behind `NotificationSender`), Indirection (the adapter between clients and the provider),
 Low Coupling (clients hold one small interface each).
 
@@ -146,7 +148,7 @@ already carries a `returnedDate`, so no second close, no second fine, no second 
 1. **Extra structure:** three classes where Part 1 had one, and one more hop when tracing a message.
 2. **Simulated delivery:** the outbox and console log model the call boundary only — no real failures,
    retries, authentication or network.
-3. **The `notifier.notify(reservation)` contract** is implemented by my call sites but `HoldNotifier` itself is
+3. **The `book.notify(reservation)` contract** is implemented by my call sites but `HoldNotifier` itself is
    Elion's; until it lands, hold notification is exercised with a test double.
 4. **`returnCopy()` returns `Fine | null`,** as agreed in Part 1, so `null` means both "refused" and
    "returned with no fine"; the desk distinguishes them by checking `copy.currentLoan()` before/after
@@ -210,7 +212,7 @@ already carries a `returnedDate`, so no second close, no second fine, no second 
 14. **Why three controllers instead of one?** GRASP Controller plus cohesion: one controller per screen and
     task group, each with a handful of operations and three collaborators, instead of one 19-operation class.
 15. **Walk through `returnCopy()` in order.** find copy → find active loan → refuse if invalid → close loan →
-    if overdue, `calculateFine(daysLate)` and `loan.createFine` → `getBook().nextReservation()` → if a student
+    if overdue, `calculateFine(daysLate)` and verify `loan.createFine` before closing → `getBook().nextReservation()` → if a student
     waits, `calculateHoldDueDate`, `hold`, `notify` → return the `Fine`.
 16. **Where does the fine rate live?** Only in `LibrarySettings.fineRate`, used through `calculateFine()`;
     a test asserts no other file in `src/` contains a policy value.

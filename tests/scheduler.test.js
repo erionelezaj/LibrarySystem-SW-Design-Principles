@@ -3,9 +3,9 @@ import { ReminderScheduler } from "../src/ReminderScheduler.js";
 import { EmailAdapter } from "../src/EmailAdapter.js";
 import { EmailService } from "../src/EmailService.js";
 import { LibrarySettings } from "../src/LibrarySettings.js";
-import { FakeBook, FakeCatalog, FakeNotifier, FakeSender, FakeStudent, TestLoan } from "./fakes.js";
+import { testSettings, TestHoldNotifier, FakeBook, FakeCatalog, FakeNotifier, FakeSender, FakeStudent, TestLoan } from "./fakes.js";
 
-const settings = LibrarySettings.getInstance();
+const settings = testSettings();
 const today = new Date(2026, 10, 25);
 const overdueDate = new Date(2026, 10, 15);
 const futureDate = new Date(2026, 11, 5);
@@ -74,6 +74,7 @@ assert.ok(service.outbox[0].body.includes("overdue"));
 const holdCatalog = new FakeCatalog();
 const book = holdCatalog.addBook(new FakeBook("Refactoring", "978-1"));
 const copy = book.addCopy("C-1");
+book.subscribe(notifier);
 const holdScheduler = new ReminderScheduler(holdCatalog, settings, sender, notifier);
 
 const first = book.reserve(sara);
@@ -110,3 +111,37 @@ assert.strictEqual(freeCopy.isAvailable(), true, "the copy goes back on the shel
 assert.strictEqual(notifier.notifications.length, before, "nobody to notify");
 
 console.log("scheduler.test.js: all assertions passed");
+
+// Subject subscriptions reach the real Adapter/provider after assignment only.
+const observerService = new EmailService("library@example.org");
+const observer = new TestHoldNotifier(new EmailAdapter(observerService));
+const observerCatalog = new FakeCatalog();
+const subject = observerCatalog.addBook(new FakeBook("Patterns", "observer"));
+const heldCopy = subject.addCopy("observer-copy");
+const expired = subject.reserve(sara);
+expired.hold(settings.calculateHoldDueDate(new Date(2026, 10, 20)), heldCopy);
+const waiting = subject.reserve(sara);
+subject.subscribe(observer);
+subject.subscribe({ notify(r) { assert.strictEqual(r.getCopy(), heldCopy); assert.strictEqual(r.status, "on hold"); } });
+const observerScheduler = new ReminderScheduler(observerCatalog, settings, sender);
+observerScheduler.checkExpiredHolds(today);
+assert.strictEqual(observerService.outbox.length, 1);
+assert.deepStrictEqual(observerService.outbox[0].recipients, [sara.getEmail()]);
+observerScheduler.checkExpiredHolds(today);
+assert.strictEqual(observerService.outbox.length, 1);
+
+// A refused or throwing hold must not notify subscribed observers.
+for (const throws of [false, true]) {
+    const testCatalog = new FakeCatalog();
+    const testBook = testCatalog.addBook(new FakeBook("Failure", "failure"));
+    const testCopy = testBook.addCopy("failure-copy");
+    const old = testBook.reserve(sara);
+    old.hold(settings.calculateHoldDueDate(new Date(2026, 10, 20)), testCopy);
+    const next = testBook.reserve(sara);
+    next.hold = () => { if (throws) throw new Error("hold failed"); return false; };
+    testBook.subscribe({ notify() { assert.fail("failed hold must not notify"); } });
+    const job = new ReminderScheduler(testCatalog, settings, sender);
+    if (throws) assert.throws(() => job.checkExpiredHolds(today), /hold failed/);
+    else job.checkExpiredHolds(today);
+}
+console.log("scheduler Observer contract tests passed (domain/Observer doubles)");
