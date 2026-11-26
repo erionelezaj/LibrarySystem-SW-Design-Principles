@@ -48,8 +48,8 @@ must attach it (currently a stub; composition `Loan *-- Fine`).
 
 ### My three methods in `CirculationController` (Erion's file, isolated branch)
 - `returnCopy(barcode)`: find copy → find active loan → refuse if either is missing or the loan is already
-  returned → if overdue, create and verify the fine before `loan.close(today)` →, `settings.calculateFine(loan.daysLate(today))` and
-  `loan.createFine(amount)` → `copy.getBook().nextReservation()` → if someone is waiting,
+  returned → if overdue, `settings.calculateFine(loan.daysLate(today))`, then
+  create and verify `loan.createFine(amount)` → `loan.close(today)` → `copy.getBook().nextReservation()` → if someone is waiting,
   `settings.calculateHoldDueDate(today)`, `reservation.hold(...)`, then `book.notify(reservation)` →
   return the `Fine` (or `null`).
 - `payFine(fine)` / `waiveFine(fine)`: refuse if there is no fine, otherwise delegate to `fine.pay()` /
@@ -120,8 +120,7 @@ Low Coupling (clients hold one small interface each).
 
 ## 4. Scenarios the professor is likely to ask you to walk through
 
-**A book comes back late:** scan → `catalog.findCopy(barcode)` → `copy.currentLoan()` → `loan.close(today)` →
-`loan.isOverdue(today)` is true → `loan.daysLate(today)` → `settings.calculateFine(days)` (rate 0.50/day comes
+**A book comes back late:** scan → `catalog.findCopy(barcode)` → `copy.currentLoan()` → `loan.isOverdue(today)` is true → `loan.daysLate(today)` → `settings.calculateFine(days)` (rate 0.50/day comes
 from the Singleton, never from this code) → `loan.createFine(amount)` must compose and return the `Fine` (currently missing); refuse if absent → `loan.close(today)` →
 `copy.getBook().nextReservation()` → nobody waiting → copy back on the shelf → controller returns the `Fine`,
 which the desk shows and later records as paid (`fine.pay()`).
@@ -211,7 +210,7 @@ already carries a `returnedDate`, so no second close, no second fine, no second 
     into every collaborator's constructor: one source of policy, and no hidden global lookups inside classes.
 14. **Why three controllers instead of one?** GRASP Controller plus cohesion: one controller per screen and
     task group, each with a handful of operations and three collaborators, instead of one 19-operation class.
-15. **Walk through `returnCopy()` in order.** find copy → find active loan → refuse if invalid → close loan →
+15. **Walk through `returnCopy()` in order.** find copy → find active loan → refuse if invalid →
     if overdue, `calculateFine(daysLate)` and verify `loan.createFine` before `loan.close(today)` → `getBook().nextReservation()` → if a student
     waits, `calculateHoldDueDate`, `hold`, `notify` → return the `Fine`.
 16. **Where does the fine rate live?** Only in `LibrarySettings.fineRate`, used through `calculateFine()`;
