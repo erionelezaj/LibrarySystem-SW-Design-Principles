@@ -33,7 +33,7 @@ Attributes `amount`, `paid`, `waived`; methods `pay()`, `waive()`, `isPaid()`, `
 `getAmount()`. Both `pay()` and `waive()` return `false` and change nothing if the fine is already settled.
 *Why here:* the fine is the only object that knows whether it is settled — Information Expert. The amount is
 never calculated here: `LibrarySettings.calculateFine(daysLate)` produces it and `Loan.createFine(amount)`
-attaches it (composition `Loan *-- Fine`).
+must attach it (currently a stub; composition `Loan *-- Fine`).
 
 ### `ReminderScheduler` — the daily job
 - `checkOverdueLoans(today)`: asks `Catalog.findOverdueLoans(today)`, skips returned or not-overdue loans,
@@ -122,7 +122,7 @@ Low Coupling (clients hold one small interface each).
 
 **A book comes back late:** scan → `catalog.findCopy(barcode)` → `copy.currentLoan()` → `loan.close(today)` →
 `loan.isOverdue(today)` is true → `loan.daysLate(today)` → `settings.calculateFine(days)` (rate 0.50/day comes
-from the Singleton, never from this code) → `loan.createFine(amount)` composes the `Fine` on the loan →
+from the Singleton, never from this code) → `loan.createFine(amount)` must compose and return the `Fine` (currently missing); refuse if absent → `loan.close(today)` →
 `copy.getBook().nextReservation()` → nobody waiting → copy back on the shelf → controller returns the `Fine`,
 which the desk shows and later records as paid (`fine.pay()`).
 
@@ -201,7 +201,7 @@ already carries a `returnedDate`, so no second close, no second fine, no second 
 9. **Adapter or Strategy?** Strategy swaps interchangeable algorithms behind one interface; we translate one
    fixed call into a provider's format — there is no second algorithm to choose.
 10. **How do Observer and Adapter work together?** Observer decides the event and the recipient
-    (`notify(reservation)` → `HoldNotifier` → student's email); Adapter converts the sending call to the
+    (`Book.notify(reservation)` → subscribed `HoldNotifier` → student's email); Adapter converts the sending call to the
     provider's interface.
 11. **Where is the Observer trigger in your code?** In `returnCopy()` and `checkExpiredHolds()`, immediately
     after `reservation.hold(...)` succeeds — so nobody is emailed who did not receive a hold.
@@ -212,14 +212,14 @@ already carries a `returnedDate`, so no second close, no second fine, no second 
 14. **Why three controllers instead of one?** GRASP Controller plus cohesion: one controller per screen and
     task group, each with a handful of operations and three collaborators, instead of one 19-operation class.
 15. **Walk through `returnCopy()` in order.** find copy → find active loan → refuse if invalid → close loan →
-    if overdue, `calculateFine(daysLate)` and verify `loan.createFine` before closing → `getBook().nextReservation()` → if a student
+    if overdue, `calculateFine(daysLate)` and verify `loan.createFine` before `loan.close(today)` → `getBook().nextReservation()` → if a student
     waits, `calculateHoldDueDate`, `hold`, `notify` → return the `Fine`.
 16. **Where does the fine rate live?** Only in `LibrarySettings.fineRate`, used through `calculateFine()`;
     a test asserts no other file in `src/` contains a policy value.
 17. **Can a waived fine then be paid?** No. `pay()` and `waive()` both check `isSettled()` first, return
     `false` and leave the state untouched; the controller passes that `false` back to the UI.
 18. **What happens when several students reserve the same title?** They wait in reservation order;
-    `Book.nextReservation()` gives the freed copy to the first `waiting` reservation, which alone is held and
+    `Book.nextReservation()` selects the first `waiting` reservation, which alone is held and
     notified; the rest keep their positions.
 19. **What happens when a hold expires?** The daily check expires it (releasing the copy), then either holds
     the copy for the next waiting student with a fresh hold date and notifies them, or returns it to the shelf.
