@@ -1,128 +1,78 @@
 @startuml SequenceReturn
-actor "Staff (Librarian/Asst)" as Staff
+actor Staff
 participant ":LibraryRenderer" as UI
 participant ":CirculationController" as Controller
 participant ":Catalog" as Catalog
-participant "c:Copy" as Copy
-participant "l:Loan" as Loan
-participant "f:Fine" as Fine
-participant "b:Book" as Book
-participant "r:Reservation" as Reservation
+participant "copy:Copy" as Copy
+participant "loan:Loan" as Loan
 participant ":LibrarySettings" as Settings
-participant ":HoldNotifier" as Notifier
-participant "s:Student" as Student
-participant ":EmailAdapter" as Adapter
+participant "fine:Fine" as Fine
+participant "book:Book (Subject)" as Book
+participant "next:Reservation" as Reservation
+participant ":HoldNotifier (HoldObserver)" as Observer
+participant "student:Student" as Student
+participant ":EmailAdapter (NotificationSender)" as Adapter
 participant ":EmailService" as Service
-
-Staff -> UI: return copy (scan barcode)
-activate UI
+note over UI,Service
+Controller workflow on the stacked branch.
+Catalog, Copy, Book, Reservation, Student and Observer classes are pending.
+Loan.createFine currently returns undefined; fine construction below is an owner contract.
+Book subscriptions are established during wiring, before this use case.
+end note
+Staff -> UI: scan return
 UI -> Controller: returnCopy(barcode)
-activate Controller
-
 Controller -> Catalog: findCopy(barcode)
-activate Catalog
-Catalog --> Controller: c
-deactivate Catalog
-
-alt c == null (unknown barcode)
-    Controller --> UI: null (refused)
-else c found
+Catalog --> Controller: copy
+alt copy missing
+    Controller --> UI: null
+else copy found
     Controller -> Copy: currentLoan()
-    activate Copy
-    Copy --> Controller: l
-    deactivate Copy
-
-    alt l == null or l already returned
-        Controller --> UI: null (refused)
-    else active loan
-        Controller -> Loan: close(today)
-        activate Loan
-        deactivate Loan
-
+    Copy --> Controller: loan
+    alt no loan or already returned
+        Controller --> UI: null
+    else open loan
         Controller -> Loan: isOverdue(today)
-        activate Loan
         Loan --> Controller: late
-        deactivate Loan
-
-        opt late == true
+        opt late
             Controller -> Loan: daysLate(today)
-            activate Loan
             Loan --> Controller: days
-            deactivate Loan
-
             Controller -> Settings: calculateFine(days)
-            activate Settings
             Settings --> Controller: amount
-            deactivate Settings
-
             Controller -> Loan: createFine(amount)
-            activate Loan
-            Loan -> Fine: new Fine(amount)
-            activate Fine
-            Fine --> Loan: f
-            deactivate Fine
-            Loan --> Controller: f
-            deactivate Loan
+            note over Loan,Fine: Required owner implementation: attach new Fine(amount) and return it
+            Loan --> Controller: fine (currently undefined)
         end
-
-        Note over Copy: l is closed, so c is available again\nunless a student is waiting for it
-
-        Controller -> Copy: getBook()
-        activate Copy
-        Copy --> Controller: b
-        deactivate Copy
-
-        Controller -> Book: nextReservation()
-        activate Book
-        Book --> Controller: r
-        deactivate Book
-
-        alt r != null (a student is waiting)
-            Controller -> Settings: calculateHoldDueDate(today)
-            activate Settings
-            Settings --> Controller: holdDueDate
-            deactivate Settings
-
-            Controller -> Reservation: hold(holdDueDate, c)
-            activate Reservation
-            deactivate Reservation
-            Note over Copy,Reservation: c is now held for r,\nso c is not available
-
-            Controller -> Notifier: notify(r)
-            activate Notifier
-
-            Notifier -> Reservation: getStudent()
-            activate Reservation
-            Reservation --> Notifier: s
-            deactivate Reservation
-
-            Notifier -> Student: getEmail()
-            activate Student
-            Student --> Notifier: emailAddr
-            deactivate Student
-
-            Notifier -> Adapter: sendTo(emailAddr, "Your reserved copy is ready")
-            activate Adapter
-            Adapter -> Service: deliver({recipients: [emailAddr],\nsubject, body})
-            activate Service
-            Service --> Adapter: mail
-            deactivate Service
-            Adapter --> Notifier
-            deactivate Adapter
-
-            Notifier --> Controller
-            deactivate Notifier
-
-        else r == null (nobody waiting)
-            Note over Copy: c stays on the shelf
+        alt late and no fine
+            Controller --> UI: throws integration error
+            note over Copy,Loan: Loan stays open; no hold assignment or notification
+        else on time or fine created
+            Controller -> Loan: close(today)
+            Controller -> Copy: getBook()
+            Copy --> Controller: book
+            Controller -> Book: nextReservation()
+            Book --> Controller: next
+            opt next exists
+                Controller -> Settings: calculateHoldDueDate(today)
+                Settings --> Controller: holdDueDate
+                Controller -> Reservation: hold(holdDueDate, copy)
+                Reservation --> Controller: false if refused; void if assigned
+                opt hold succeeded
+                    Controller -> Book: notify(next)
+                    loop subscribed HoldObservers (pending contract)
+                        Book -> Observer: notify(next)
+                        Observer -> Reservation: getStudent()
+                        Reservation --> Observer: student
+                        Observer -> Student: getEmail()
+                        Student --> Observer: email
+                        Observer -> Adapter: sendTo(email, message)
+                        Adapter -> Service: deliver({recipients: [email], subject, body})
+                    end
+                end
+            end
+            Controller --> UI: Fine or null (on time)
         end
-
-        Controller --> UI: f (fine, if any)
     end
 end
-
-deactivate Controller
-UI --> Staff: return recorded
-deactivate UI
-
+note over UI: Distinguish refused from on-time null by inspecting the loan state.
+Show an integration failure if an error is thrown.
 @enduml
