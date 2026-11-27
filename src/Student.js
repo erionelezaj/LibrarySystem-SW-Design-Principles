@@ -1,13 +1,10 @@
 export class Student {
-    constructor(name, email) {
-        this.name = name;
+    constructor(fullName, studentId, email) {
+        this.fullName = fullName;
+        this.studentId = studentId;
         this.email = email;
         this.loans = [];
         this.reservations = [];
-    }
-
-    getEmail() {
-        return this.email;
     }
 
     getLoans() {
@@ -30,5 +27,9 @@ export class Student {
         }
 
         return fines;
+    }
+
+    getEmail() {
+        return this.email;
     }
 }
